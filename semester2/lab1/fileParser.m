@@ -22,7 +22,7 @@ while (1)
     %y(i) = dots(1 : steps, 2);
     nodeCounts(i) = fscanf(F, '%i', 1);
     deviations(i) = fscanf(F, '%f', 1);
-    fscanf(F, '%c', 2);
+    fscanf(F, '%c', 1);
     i = i + 1;
 end
 

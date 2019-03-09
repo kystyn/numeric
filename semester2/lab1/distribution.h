@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <ctime>
+#include <cmath>
 #include <algorithm>
 
 
@@ -10,12 +11,13 @@ class interpolator;
 class distribution {
 public:
   double a, b;
-  int nodeCount;
-  int needEvalGrid;
+  unsigned int nodeCount;
+  bool needEvalGrid;
   std::vector<double> grid;
 
   distribution( void ) {}
-  distribution( std::vector<double> const &gr ) : grid(gr), a(gr.front()), b(gr.back()), nodeCount(gr.size()) {}
+  explicit distribution( distribution const & ) {}
+  distribution( std::vector<double> const &gr ) : a(gr.front()), b(gr.back()), nodeCount(gr.size()), grid(gr) {}
   distribution( double a, double b, int nodeCount ) : a(a), b(b), nodeCount(nodeCount), needEvalGrid(true) { grid.resize(nodeCount); }
   std::vector<double> const & operator()( void ) { return grid; }
 
@@ -30,9 +32,11 @@ public:
     return *this;
   }
 
-  double operator[]( int i ) const {
+  double operator[]( unsigned int i ) const {
     return grid[i];
   }
+
+  virtual ~distribution() {}
 };
 
 class uniform : public distribution {
@@ -58,7 +62,7 @@ public:
   random( double a, double b, int nodeCount ) : distribution(a, b, nodeCount) {}
 
   distribution & eval( void ) {
-    srand(time(NULL));
+    srand(time(nullptr));
     double h = (b - a) / (double)(nodeCount - 1);
     int step = 0;
     for (std::vector<double>::iterator it = grid.begin(); it < grid.end(); ++it)

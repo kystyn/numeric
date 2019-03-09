@@ -1,6 +1,6 @@
 function main()
  N = prepare(0.1, 1.1);
- system('lab1.exe');
+ system('./lab1');
  [mask, nodeCounts, deviations] = fileParser('hermit.out', N);
  
  chkMask = zeros(1, 3);
@@ -8,7 +8,7 @@ function main()
  color(2) = 'b';
  color(3) = 'g';
  
- figure;
+figure;
  
 grids(1) = 'R';
 grids(2) = 'U';

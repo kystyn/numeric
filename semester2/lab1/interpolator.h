@@ -16,7 +16,6 @@ private:
   distribution gridX;
   value_distribution gridY;
 
-  const double epsilon;
   bool
     needRebuildDiff;
 
@@ -32,12 +31,12 @@ private:
 
 public:
 
-  interpolator( void ) : func(NULL),
-    epsilon(1e-15), needRebuildDiff(true) {}
+  interpolator( void ) : func(nullptr),
+    needRebuildDiff(true) {}
 
-  interpolator( double (*f)( double ), double a, double b, int nodeCount, 
+  interpolator( double (*f)( double ),
     std::vector<double (*)( double )> derivatives = std::vector<double (*)( double )>() ) :
-    func(f), derivatives(derivatives), epsilon(1e-15), needRebuildDiff(true) {}
+    func(f), derivatives(derivatives), needRebuildDiff(true) {}
 
   interpolator & operator=( interpolator const &I ) {
     this->derivatives = I.derivatives;
@@ -45,6 +44,8 @@ public:
     this->func = I.func;
     this->gridX = I.gridX;
     this->gridY = I.gridY;
+
+    return *this;
   }
 
   interpolator & setFunc( double (*f)( double ), std::vector<double (*)( double )> ders = std::vector<double (*)( double )>() ) {
@@ -54,7 +55,7 @@ public:
     return *this;
   }
 
-  interpolator & setGrid( distribution &newGridX ) {
+  interpolator & setGrid( distribution const &newGridX ) {
     gridX = newGridX;
     gridY = value_distribution(gridX, func);
     gridY.eval();
@@ -65,23 +66,23 @@ public:
   interpolator & buildDividedDifferenceTable( void ) {
     dividedDiff.resize((derivatives.size() + 1) * gridX.nodeCount);
 
-    for (int i = 0, n = dividedDiff.size(); i < n; i++)
+    for (long long i = 0, n = dividedDiff.size(); i < n; i++)
       dividedDiff[i].resize(n - i);
 
     std::vector<double> extGridX(dividedDiff.size());
 
-    for (int i = 0, n = dividedDiff.size(), k = derivatives.size() + 1; i < n; i++) {
-      extGridX[i] = gridX[i / k];
-      dividedDiff[0][i] = gridY[i / k];
+    for (long long i = 0, n = dividedDiff.size(), k = derivatives.size() + 1; i < n; i++) {
+      extGridX[i] = gridX[static_cast<unsigned int>(i / k)];
+      dividedDiff[0][i] = gridY[static_cast<unsigned int>(i / k)];
     }
 
-    for (int i = 1, n = dividedDiff.size(); i < n; i++)
-      for (int j = 0, m = dividedDiff[i].size(); j < m; j++) {
-        int k = derivatives.size() + 1 - i;
+    for (long long i = 1, n = dividedDiff.size(); i < n; i++)
+      for (long long j = 0, m = dividedDiff[i].size(); j < m; j++) {
+        long long k = static_cast<long long>(derivatives.size() + 1 - i);
 
         //if (extGridX[i + j] - extGridX[j] == 0)
         if (k > 0 && j % (derivatives.size() + 1) < k)
-          dividedDiff[i][j] = derivatives[i - 1](extGridX[j + i - 1]) / (double)factorial(i);
+          dividedDiff[i][j] = derivatives[i - 1](extGridX[j + i - 1]) / double(factorial(i));
         else
           dividedDiff[i][j] = (dividedDiff[i - 1][j + 1] - dividedDiff[i - 1][j]) / (extGridX[i + j] - extGridX[j]);
       }
@@ -99,12 +100,12 @@ public:
       throw "Grid of divided difference table was not rebuilt";
 
     double res = 0;
-    int derCnt = derivatives.size() + 1;
+    long long derCnt = derivatives.size() + 1;
 
-    for (int k = 0, n = dividedDiff.size(); k < n; k++) {
+    for (long long k = 0, n = dividedDiff.size(); k < n; k++) {
       double localRes = dividedDiff[k][0];
 
-      for (int i = 0; i <= k - 1; i++)
+      for (long long i = 0; i <= k - 1; i++)
         localRes *= (x - gridX[i / derCnt]);
 
       res += localRes;
@@ -119,7 +120,7 @@ public:
 
     double d = 0;
 
-    for (int i = 0; i < gridX.nodeCount - 1; i++) {
+    for (long long i = 0; i < gridX.nodeCount - 1; i++) {
       double
         //arg = gridX[i],
         arg = (gridX[i] + gridX[i + 1]) / 2.0,
