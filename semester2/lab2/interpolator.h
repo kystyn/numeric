@@ -26,7 +26,7 @@ private:
 
   std::vector<double> PolinomialCoeffs;
 
-  const double Tollerance;
+  const double Tolerance;
 
   static unsigned int factorial( unsigned int n ) {
     unsigned int res = 1;
@@ -38,11 +38,11 @@ private:
 
 public:
 
-  least_square_interpolator( void ) : Func(nullptr), Tollerance(1e-10) {}
+  least_square_interpolator( void ) : Func(nullptr), Tolerance(1e-10) {}
 
   least_square_interpolator( func F, basis_func BF,
                              double a, double b, size_t NodeCount ) :
-      Func(F), BasisFunc(BF), GridX(a, b, NodeCount), Tollerance(1e-15) {}
+      Func(F), BasisFunc(BF), GridX(a, b, NodeCount), Tolerance(1e-15) {}
 
   least_square_interpolator & operator=( least_square_interpolator const &I ) {
     this->Func = I.Func;
@@ -95,7 +95,7 @@ public:
           }
           b[i] = y * bi;
       }
-      PolinomialCoeffs = mth::lieqsys::Relax(A, b, mth::vec(b.getN(), 0), 1.2, Tollerance, steps);
+      PolinomialCoeffs = mth::lieqsys::Relax(A, b, mth::vec(b.getN(), 0), 1, Tolerance, steps);
   }
 
   double operator()( double X ) {
