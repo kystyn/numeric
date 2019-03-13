@@ -40,9 +40,10 @@ public:
 
   least_square_interpolator( void ) : Func(nullptr), Tolerance(1e-10) {}
 
-  least_square_interpolator( func F, basis_func BF,
-                             double a, double b, size_t NodeCount ) :
-      Func(F), BasisFunc(BF), GridX(a, b, NodeCount), Tolerance(1e-15) {}
+  least_square_interpolator( func F, basis_func BF, distribution const &GridX ) :
+      Func(F), BasisFunc(BF), GridX(GridX), Tolerance(1e-15) {
+      GridY = value_distribution(GridX, Func);
+  }
 
   least_square_interpolator & operator=( least_square_interpolator const &I ) {
     this->Func = I.Func;
@@ -67,7 +68,6 @@ public:
   least_square_interpolator & setGrid( distribution &NewGridX ) {
     GridX = NewGridX;
     GridY = value_distribution(GridX, Func);
-    GridY.eval();
 
     return *this;
   }
@@ -79,6 +79,9 @@ public:
   }
 
   void genPolinom( void ) {
+      if (Weights.size() > GridX.NodeCount)
+          throw "There should be less weights then grid nodes";
+
       int steps;
       std::vector<double> polinomialCoeffs;
       mth::matr A(Weights.size());
@@ -88,14 +91,14 @@ public:
 
       for (uint i = 0; i < A.getH(); i++) {
           tabulated_basis_func
-            bi(BasisFunc, GridX[i], Weights);
+            bi(BasisFunc, GridX, i, Weights);
           for (uint j = 0; j < A.getW(); j++) {
-              tabulated_basis_func bj(BasisFunc, GridX[j], Weights);
+              tabulated_basis_func bj(BasisFunc, GridX, j, Weights);
               A[i][j] = bi * bj;
           }
           b[i] = y * bi;
       }
-      PolinomialCoeffs = mth::lieqsys::Relax(A, b, mth::vec(b.getN(), 0), 1, Tolerance, steps);
+      PolinomialCoeffs = mth::lieqsys::Relax(A, b, mth::vec(b.getN(), 0), 1.2, Tolerance, steps);
   }
 
   double operator()( double X ) {

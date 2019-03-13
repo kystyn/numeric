@@ -21,7 +21,9 @@ public:
 
   distribution( std::vector<double> const &gr ) : a(gr.front()), b(gr.back()), NodeCount(gr.size()), Grid(gr) {}
 
-  distribution( double a, double b, size_t NodeCount ) : a(a), b(b), NodeCount(NodeCount), NeedEvalGrid(true) { Grid.resize(NodeCount); }
+  distribution( double a, double b, size_t NodeCount ) : a(a), b(b), NodeCount(NodeCount), NeedEvalGrid(true) {
+      Grid.resize(NodeCount);
+  }
   std::vector<double> const & operator()( void ) { return Grid; }
 
   virtual distribution & eval( void ) { return *this; }
@@ -49,7 +51,7 @@ public:
 class uniform : public distribution {
 public:
   uniform( void ) {}
-  uniform( double a, double b, size_t NodeCount ) : distribution(a, b, NodeCount) {}
+  uniform( double a, double b, size_t NodeCount ) : distribution(a, b, NodeCount) { eval(); }
 
   distribution & eval( void ) {
     double h = (b - a) / (double)(NodeCount - 1);
@@ -114,7 +116,7 @@ public:
   value_distribution( void ) {}
 
   value_distribution( distribution const &DistrX, func F ) :
-    distribution(DistrX.a, DistrX.b, DistrX.NodeCount), F(F), DistrX(DistrX) {}
+    distribution(DistrX.a, DistrX.b, DistrX.NodeCount), F(F), DistrX(DistrX) { eval(); }
 
   distribution & eval( void ) {
     std::vector<double>::const_iterator itX;

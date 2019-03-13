@@ -12,12 +12,16 @@ struct data {
   int nodeCount;
   char gridT;
   int weightsT;
+  int weightsCount;
   int funcT;
 
-  data( void ) : a(0), b(0), nodeCount(0), gridT('u'), weightsT(0), funcT(0){}
+  data( void ) : a(0), b(0), nodeCount(0),
+      gridT('u'), weightsT(0), weightsCount(0), funcT(0){}
 
-  data( double a, double b, int node, char gr, int der, int f ) :
-  a(a), b(b), nodeCount(node), gridT(gr), weightsT(der), funcT(f) {}
+  data( double a, double b, int node, char gr, int weightsT, int weightsCnt, int f ) :
+    a(a), b(b), nodeCount(node),
+    gridT(gr), weightsT(weightsT),
+    weightsCount(weightsCnt), funcT(f) {}
 };
 
 class controller {
@@ -34,13 +38,13 @@ private:
     for (int i = 0; ; i++) {
       double a, b;
       char gridT;
-      int weightsT, funcT;
+      int weightsT, funcT, weightsCount;
       int nc;
       if (f >> a)
-        f >> b >> nc >> gridT >> weightsT >> funcT;
+        f >> b >> nc >> gridT >> weightsT >> weightsCount >> funcT;
       else
         break;
-      loadedData.push_back(data(a, b, nc, gridT, weightsT, funcT));
+      loadedData.push_back(data(a, b, nc, gridT, weightsT, weightsCount, funcT));
     }
 
     return *this;

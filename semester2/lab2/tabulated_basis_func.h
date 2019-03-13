@@ -13,17 +13,15 @@ private:
     std::vector<double> const &Weights;
 
 public:
-    tabulated_basis_func( std::function<double(double, int)> &F, double ValX,
+    tabulated_basis_func( std::function<double(double, int)> &F, std::vector<double> const &Grid, uint BasisFuncNum,
                 std::vector<double> const &Weights ) :
         Weights(Weights), Func(Weights.size()) {
         for (uint i = 0, size = Weights.size(); i < size; i++)
-            Func[i] = F(ValX, i);
+            Func[i] = F(Grid[i], BasisFuncNum);
     }
 
-    tabulated_basis_func( std::vector<double> const &F, std::vector<double> const &W ) : Func(F), Weights(W) {
-        if (F.size() != W.size())
-            throw "Bad basis function!";
-    }
+    tabulated_basis_func( std::vector<double> const &Func, std::vector<double> const &Weights ) :
+        Func(Func), Weights(Weights) {}
 
     double operator*( tabulated_basis_func const &F ) {
         double res = 0;
