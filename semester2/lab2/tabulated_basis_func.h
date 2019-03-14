@@ -15,8 +15,8 @@ private:
 public:
     tabulated_basis_func( std::function<double(double, int)> &F, std::vector<double> const &Grid, uint BasisFuncNum,
                 std::vector<double> const &Weights ) :
-        Weights(Weights), Func(Weights.size()) {
-        for (uint i = 0, size = Weights.size(); i < size; i++)
+        Weights(Weights), Func(Grid.size()) {
+        for (uint i = 0, size = Grid.size(); i < size; i++)
             Func[i] = F(Grid[i], BasisFuncNum);
     }
 

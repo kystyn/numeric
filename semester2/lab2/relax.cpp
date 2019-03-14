@@ -24,9 +24,9 @@ mth::vec mth::lieqsys::Relax( matr const &A, vec const &b, vec const &x0, double
         R[y][x] = 0;
     }
 
-  vec x = x0, prevx;
+  vec x = x0, prevx = x0 + vec(x0.getN(), 1);
 
-  while (x.cmp(x0, Epsilon) == matr::OK || !(x - prevx) >= Epsilon) {
+  while (!(x - prevx) >= Epsilon) {
     Steps++;
     for (int i = 0; i < b.getN(); i++) {
       double s1 = 0, s2 = 0;

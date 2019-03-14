@@ -10,7 +10,7 @@
 #include "tabulated_basis_func.h"
 
 #include "matr.h"
-#include "relax.h"
+#include "ldr.h"
 
 class least_square_interpolator {
 public:
@@ -25,6 +25,7 @@ private:
   std::vector<double> Weights;
 
   std::vector<double> PolinomialCoeffs;
+  size_t PolinomDimension;
 
   const double Tolerance;
 
@@ -40,8 +41,8 @@ public:
 
   least_square_interpolator( void ) : Func(nullptr), Tolerance(1e-10) {}
 
-  least_square_interpolator( func F, basis_func BF, distribution const &GridX ) :
-      Func(F), BasisFunc(BF), GridX(GridX), Tolerance(1e-15) {
+  least_square_interpolator( func F, basis_func BF, size_t PolinomDimension, distribution const &GridX ) :
+      Func(F), BasisFunc(BF), GridX(GridX), PolinomDimension(PolinomDimension), Tolerance(1e-15) {
       GridY = value_distribution(GridX, Func);
   }
 
@@ -59,8 +60,9 @@ public:
     return *this;
   }
 
-  least_square_interpolator & setBasisFunc( basis_func F ) {
+  least_square_interpolator & setBasisFunc( basis_func F, size_t PolinomDim ) {
     BasisFunc = F;
+    PolinomDimension = PolinomDim;
 
     return *this;
   }
@@ -79,13 +81,16 @@ public:
   }
 
   void genPolinom( void ) {
-      if (Weights.size() > GridX.NodeCount)
-          throw "There should be less weights then grid nodes";
+      if (PolinomDimension > GridX.NodeCount)
+          throw "There should be less weights than grid nodes";
+
+      if (Weights.size() != GridX.NodeCount)
+          throw "There should be the same quantity of weights as grid size";
 
       int steps;
       std::vector<double> polinomialCoeffs;
-      mth::matr A(Weights.size());
-      mth::vec b(Weights.size());
+      mth::matr A(PolinomDimension);
+      mth::vec b(PolinomDimension);
 
       tabulated_basis_func y(GridY, Weights);
 
@@ -98,7 +103,11 @@ public:
           }
           b[i] = y * bi;
       }
-      PolinomialCoeffs = mth::lieqsys::Relax(A, b, mth::vec(b.getN(), 0), 1.2, Tolerance, steps);
+      mth::matr L, D, R;
+      mth::lieqsys::LDLTDecomposition(A, L, D, R);
+      PolinomialCoeffs = mth::lieqsys::LDRSolve(L, D, R, b);
+      double len = !(A * PolinomialCoeffs -  b);
+      ///mth::lieqsys::Relax(A, b, mth::vec(b.getN(), 0), 1.2, Tolerance, steps);
   }
 
   double operator()( double X ) {

@@ -6,7 +6,9 @@ CONFIG -= qt
 SOURCES += \
         main.cpp \
     matr.cpp \
-    relax.cpp
+    relax.cpp \
+    simple.cpp \
+    ldr.cpp
 
 HEADERS += \
     distribution.h \
@@ -15,4 +17,6 @@ HEADERS += \
     matr.h \
     relax.h \
     def.h \
-    tabulated_basis_func.h
+    tabulated_basis_func.h \
+    simple.h \
+    ldr.h

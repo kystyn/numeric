@@ -210,7 +210,7 @@ public:
 
   vec( size_t N ) : V(N), N(N) {}
 
-  vec( size_t N, int Val ) : V(N, Val), N(N) {}
+  vec( size_t N, double Val ) : V(N, Val), N(N) {}
 
   size_t getN() const { return N; }
 

@@ -76,8 +76,11 @@ public:
     //return 8 * pow(x, 7);
   }
 
-  controller( least_square_interpolator::basis_func &F ) {
-      i.setBasisFunc(F);
+  controller( least_square_interpolator::basis_func F, size_t PolyDimen, const char *fileName = nullptr ) {
+      i.setBasisFunc(F, PolyDimen);
+
+      if (fileName)
+        loadFromFile(fileName);
   }
 
   distribution *& operator[]( char p ) {
@@ -87,11 +90,6 @@ public:
   controller & operator<<( func v ) {
     availableFunctions.push_back(v);
     return *this;
-  }
-
-  controller( const char *fileName, least_square_interpolator::basis_func F ) {
-    loadFromFile(fileName);
-    i.setBasisFunc(F);
   }
 
   void run( const char *fileName ) {
