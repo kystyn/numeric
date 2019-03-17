@@ -11,6 +11,7 @@
 
 #include "matr.h"
 #include "ldr.h"
+#include "relax.h"
 
 class least_square_interpolator {
 public:
@@ -42,7 +43,7 @@ public:
   least_square_interpolator( void ) : Func(nullptr), Tolerance(1e-10) {}
 
   least_square_interpolator( func F, basis_func BF, size_t PolinomDimension, distribution const &GridX ) :
-      Func(F), BasisFunc(BF), GridX(GridX), PolinomDimension(PolinomDimension), Tolerance(1e-15) {
+      Func(F), BasisFunc(BF), GridX(GridX), PolinomDimension(PolinomDimension + 1), Tolerance(1e-15) {
       GridY = value_distribution(GridX, Func);
   }
 
@@ -88,7 +89,6 @@ public:
           throw "There should be the same quantity of weights as grid size";
 
       int steps;
-      std::vector<double> polinomialCoeffs;
       mth::matr A(PolinomDimension);
       mth::vec b(PolinomDimension);
 

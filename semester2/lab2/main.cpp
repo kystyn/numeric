@@ -9,16 +9,19 @@ int main()
 {
     pow(1, 0);
     try {
-        constexpr int dim = 3;
-        constexpr int nodes = 11;
+        constexpr int dim = 12;
+        constexpr int nodes = 101;
         auto Func = [] ( double x ) {
-            return sin(x * x * x);
+            return log(1 + cos(x) * cos(x));
         };
         auto BasisFunc = [] ( double x, int j ) {
-            //return cos(j * acos(0.5 * (1 + x)));
-            return pow(x, j);
+            //return cos(j * acos(0.6 + 0.5 * x));
+            double r = 1;
+            for (int i = 1; i <= j; i++)
+                r *= x;
+            return r;
         };
-        least_square_interpolator i(Func, BasisFunc, dim, uniform(1, 2, nodes));
+        least_square_interpolator i(Func, BasisFunc, dim, uniform(0.1, 1.1, nodes));
         i.setWeights(std::vector<double>(nodes, 1)).genPolinom();
 
         std::cout << "Deviation = " << !i << std::endl;
