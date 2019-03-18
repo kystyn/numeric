@@ -9,7 +9,7 @@ using namespace mth;
  *   - matrix:
  *       std::vector<std::vector<double>> &A;
  *   - size:
- *       int N;
+ *       uint N;
  *   - right vector:
  *       std::vector<double> &b;
  *   - non-allocated L, D, R matrices;
@@ -20,34 +20,29 @@ void lieqsys::LDLTDecomposition( matr const &A,
                        matr &D,
                        matr &R )
 {
-  uint N = A.getH();
+  size_t N = A.getH();
 
   /* Variables for LDR */
-  vec f(N), g(N), x(N), y(N);
+  vec g(N), x(N);
   double beta;
 
   L = matr(N, N);
   D = matr(N, N);
-  R = matr(N, N);
 
   /* A1 = L1 * D1 * R1 */
 
   L[0][0] = 1;
   D[0][0] = A[0][0];
-  R[0][0] = 1;
 
   for (uint k = 2; k <= N; k++)
   {
     /* Fill g_k-1T */
     for (uint i = 0; i < k - 1; i++)
       g[i] = A[k - 1][i];
-    /* Fill f_k-1 */
-    for (uint i = 0; i < k - 1; i++)
-      f[i] = A[i][k - 1];
 
     /*** Set Lk ***/
     /* Solve X */
-    mth::lieqsys::Left(R.transposing() * D.transposing(),
+    mth::lieqsys::Left(L * D,
       g, x, k - 1);
 
     for (uint i = 0; i < k - 1; i++)
@@ -59,7 +54,7 @@ void lieqsys::LDLTDecomposition( matr const &A,
 
     /*** Set Dk ***/
     /* Solve beta */
-    beta = A[k - 1][k - 1] - (x * D) * y;
+    beta = A[k - 1][k - 1] - x * D * x;
     for (uint i = 0; i < k - 1; i++)
     {
       D[i][k - 1] = 0;
@@ -67,7 +62,6 @@ void lieqsys::LDLTDecomposition( matr const &A,
     }
     D[k - 1][k - 1] = beta;
   }
-
   R = L.transposing();
 } /* End of 'LDRDecomposition' function */
 
@@ -84,7 +78,7 @@ vec lieqsys::LDRSolve( matr const &L,
                matr const &R,
                vec const &b )
 {
-  int N = L.getH();
+  size_t N = L.getH();
   vec x(N), y(N), z(N);
 
   /* Ly = b */

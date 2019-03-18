@@ -9,4 +9,6 @@ using func = function<double(double)>;
 
 using uint = unsigned int;
 
+static const double pi = 3.14159265358979323;
+
 #endif // DEF_H

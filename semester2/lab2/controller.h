@@ -62,7 +62,7 @@ public:
   }
 
   static double nonDiffFunc( double x ) {
-    return fabs(log(1 + cos(x) * cos(x)) - 0.1);
+    return fabs(log(1 + cos(x) * cos(x)) - 0.4);
     //return pow(x, 8) + 1;
   }
 
@@ -102,10 +102,9 @@ public:
             setPolyDimension(d.polynomDegree).
             setFunc(f).
             setGrid(availableGridX[d.gridT]->setBorders(d.a, d.b, d.nodeCount).eval()).
-            setWeights(availableWeights[d.weightsT]->setBorders(d.nodeCount).eval()).
+            setWeights(availableWeights[d.weightsT]->setBorders(d.a, d.b, d.nodeCount).eval()).
             genPolinom();
 
-      fs << d.polynomDegree << ' ' << d.nodeCount << '\n';
       i.output(fs);
     }
   }

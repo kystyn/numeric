@@ -19,10 +19,7 @@ int main()
         controller c(BasisFunc, "lsm.in");
 
         auto normalDistribution = [] ( double mu, double sigma, double x ) {
-            double
-                    pi = acos(-1),
-                    e = (x - mu) / sigma;
-
+            double e = (x - mu) / sigma;
             return exp(-e * e / 2) / sqrt(2 * pi * sigma);
         };
 
@@ -32,15 +29,17 @@ int main()
             addGrid('C', shared_ptr<chebyshev>(new chebyshev));
 
 
-        auto normDistr = shared_ptr<normal>(new normal(normalDistribution));
-        c.addWeightDistribution('U', shared_ptr<uniform>(new uniform(1, 1)));
+        c.addWeightDistribution('U', shared_ptr<constant>(new constant));
 
+        auto normDistr = shared_ptr<normal>(new normal(normalDistribution));
         normDistr->makeBegin();
         c.addWeightDistribution('B', normDistr);
 
+        normDistr = shared_ptr<normal>(new normal(normalDistribution));
         normDistr->makeMid();
         c.addWeightDistribution('M', normDistr);
 
+        normDistr = shared_ptr<normal>(new normal(normalDistribution));
         normDistr->makeEnd();
         c.addWeightDistribution('E', normDistr);
 

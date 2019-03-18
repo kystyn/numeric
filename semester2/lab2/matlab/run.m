@@ -20,16 +20,25 @@ function run()
   # uniform grid
   # uniform weight
   # change poly degree
+  styles = ['r'; 'g'; 'b'; 'r:'; 'g:'; 'b:';
+            'r--'; 'g--'; 'b--'; 'r-.'; 'g-.'; 'b-.'; 'r-'; 'b-'; 'g-'; 'y'];
   for funcT = 0 : 1 : 1
     figure;
-    for polyDegree = 1 : 1 : 12
+    for polyDegree = 1 : 1 : 16
       F = fopen('lsm.in', 'w');
       prepare(F, a, b, 'U', funcT, 'U', polyDegree);
       fclose(F);
-      system('./lab1');
-      drawSmth(fileParser('lsm.out'), 'r', 'Uniform grid, uniform weight, change poly deg ' + char(funcT) + '-diff. function');
+      system('./lab2');
+      [X, Y] = fileParser('lsm.out');
+      drawSmth(X, Y, styles(polyDegree, 1 : 3), strcat('Uniform grid, uniform weight, change poly deg ', char('0' + funcT),'-diff. function'));
       hold on;
+      grid on;
     end
+    legend('1', '2', '3', 
+           '4', '5', '6',
+           '7', '8', '9',
+           '10', '11', '12', 
+           '13', '14', '15', '16');
   end
   
   # uniform grid
@@ -39,12 +48,15 @@ function run()
     figure;
     for w = 1 : 1 : 4
       F = fopen('lsm.in', 'w');
-      prepare(F, a, b, 'U', funcT, weights(w), 10);
+      prepare(F, a, b, 'U', funcT, weights(w), 16);
       fclose(F);
-      system('./lab1');
-      drawSmth(fileParser('lsm.out'), 'r', 'Uniform grid, change weight, fixed grid, ' + char(funcT) + '-diff. function');
+      system('./lab2');
+      [X, Y] = fileParser('lsm.out');
+      drawSmth(X, Y, styles(w, 1 : 3), strcat('Uniform grid, change weight, fixed grid, ', char('0' + funcT), '-diff. function'));
       hold on;
+      grid on;
     end
+    legend('normal begin', 'normal mid', 'normal end', 'uniform');
   end
   
   # change grid
@@ -54,11 +66,14 @@ function run()
     figure;
     for g = 1 : 1 : 3
       F = fopen('lsm.in', 'w');
-      prepare(F, a, b, grids(g), funcT, 'U', 10);
+      prepare(F, a, b, grids(g), funcT, 'U', 16);
       fclose(F);
-      system('./lab1');
-      drawSmth(fileParser('lsm.out'), 'r', 'Change grid, uniform weight, fixed grid, ' + char(funcT) + '-diff. function');
+      system('./lab2');
+      [X, Y] = fileParser('lsm.out');
+      drawSmth(X, Y, styles(g, 1 : 3), strcat('Change grid, uniform weight, fixed grid, ', char('0' + funcT), '-diff. function'));
       hold on;
+      grid on;
     end
+    legend('random', 'uniform', 'chebyshev');
   end
 end

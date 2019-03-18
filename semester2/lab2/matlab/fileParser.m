@@ -3,7 +3,7 @@ F = fopen(fileName, 'r');
 
 data = fscanf(F, '%f');
 
-Y = data(1 : 2 : data.length - 1);
-X = data(2 : 2 : data.length);
+X = data(1 : 2 : length(data) - 1);
+Y = data(2 : 2 : length(data));
 
 end

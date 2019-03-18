@@ -28,8 +28,6 @@ private:
   std::vector<double> PolinomialCoeffs;
   size_t PolinomDimension;
 
-  const double Tolerance;
-
   static unsigned int factorial( unsigned int n ) {
     unsigned int res = 1;
     for (unsigned int i = 1; i <= n; i++)
@@ -40,10 +38,10 @@ private:
 
 public:
 
-  least_square_interpolator( void ) : Func(nullptr), Tolerance(1e-10) {}
+  least_square_interpolator( void ) : Func(nullptr) {}
 
   least_square_interpolator( func F, basis_func BF, size_t PolinomDimension, distribution const &GridX ) :
-      Func(F), BasisFunc(BF), GridX(GridX), PolinomDimension(PolinomDimension + 1), Tolerance(1e-15) {
+      Func(F), BasisFunc(BF), GridX(GridX), PolinomDimension(PolinomDimension + 1) {
       GridY = value_distribution(GridX, Func);
   }
 
@@ -109,6 +107,7 @@ public:
       }
       mth::matr L, D, R;
       mth::lieqsys::LDLTDecomposition(A, L, D, R);
+      cout << "norm " << !(A - L * D * R) << endl;
       PolinomialCoeffs = mth::lieqsys::LDRSolve(L, D, R, b);
       ///mth::lieqsys::Relax(A, b, mth::vec(b.getN(), 0), 1.2, Tolerance, steps);
   }
@@ -138,11 +137,10 @@ public:
       return m;
   }
 
-  least_square_interpolator & output( std::ofstream &f, double step = 1e-2 ) {
-    f << (GridX.b - GridX.a) / step << '\n';
+  least_square_interpolator & output( std::ofstream &f ) {
 
     f << GridX.NodeCount << " " << !*this << '\n';
-    std::cout << GridX.NodeCount << " " << !*this << '\n';
+    //std::cout << GridX.NodeCount << " " << !*this << '\n';
 
     return *this;
   }

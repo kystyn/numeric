@@ -4,6 +4,7 @@
 #include <ctime>
 #include <algorithm>
 #include <random>
+#include <memory>
 #include <cmath>
 
 #include "def.h"
@@ -41,7 +42,7 @@ public:
       NodeCount = newNodeCount;
       Grid.resize(NodeCount);
 
-      return *this;
+       return *this;
   }
 
   double operator[]( uint i ) const {
@@ -65,6 +66,20 @@ public:
     int step = 0;
     for (std::vector<double>::iterator it = Grid.begin(); it < Grid.end(); ++it)
       *it = a + step++ * h;
+
+    NeedEvalGrid = false;
+
+    return *this;
+  }
+};
+
+class constant : public distribution {
+public:
+  constant( size_t NodeCount = 1 ) : distribution(1, 1, NodeCount) { eval(); }
+
+  distribution & eval( void ) {
+    for (auto &g : Grid)
+      g = 1;
 
     NeedEvalGrid = false;
 
@@ -99,8 +114,6 @@ public:
   chebyshev( double a, double b, size_t NodeCount ) : distribution(a, b, NodeCount) {}
 
   distribution & eval( void ) {
-    double
-      pi = acos(-1);
     double
       sh = (a + b) / 2.0,
       mul = (b - a) / 2.0;
@@ -145,27 +158,29 @@ public:
 class normal : public distribution {
 private:
     function<double(double, double, double)> Function;
-    double &mu, sigma;
+    double *mu;
+    double sigma;
     double mid;
 public:
-  normal( void ) : mu(a), sigma(1) {}
-  normal( function<double(double, double, double)> F ) : Function(F), mu(a), sigma(1) {}
-  normal( double a, double b, size_t NodeCount ) : distribution(a, b, NodeCount), mu(this->a), sigma(1) { eval(); }
+  normal( void ) : mu(&mid), sigma(1) {}
+  normal( function<double(double, double, double)> F ) : Function(F), mu(&a), sigma(1) {}
+  normal( double a, double b, size_t NodeCount ) : distribution(a, b, NodeCount), mu(&this->a), sigma(1) { eval(); }
 
   normal & makeBegin( void ) {
-      mu = a;
+      mu = &a;
       sigma = 1;
       return *this;
   }
 
   normal & makeMid( void ) {
-      mu = mid;
+      mu = &mid;
+      mid = (a + b) / 2.0;
       sigma = 1;
       return *this;
   }
 
   normal & makeEnd( void ) {
-      mu = b;
+      mu = &b;
       sigma = 1;
       return *this;
   }
@@ -178,7 +193,7 @@ public:
     mid = (a + b) / 2.0;
 
     for (auto &g : Grid)
-      g = Function(mu, sigma, h * i++);
+      g = Function(*mu, sigma, h * i++);
 
     NeedEvalGrid = false;
 
