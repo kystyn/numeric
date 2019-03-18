@@ -1,4 +1,4 @@
-function [X, Y] = fileParser( fileName, N )
+function [X, Y] = fileParser( fileName )
 F = fopen(fileName, 'r');
 
 data = fscanf(F, '%f');

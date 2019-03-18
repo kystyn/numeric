@@ -15,7 +15,7 @@ using namespace mth;
  *       std::vector<double> &x;
  * RETURNS: None.
  */
-void lieqsys::Diagonal( matr const &A, vec const &b, vec &x, int N )
+void lieqsys::Diagonal( matr const &A, vec const &b, vec &x, uint N )
 {
   for (int k = 0; k < N; k++)
     x[k] = b[k] / A[k][k];
@@ -33,18 +33,15 @@ void lieqsys::Diagonal( matr const &A, vec const &b, vec &x, int N )
  *       std::vector<double> &x;
  * RETURNS: None.
  */
-void lieqsys::Left( matr const &A, vec const &b, vec &x, int N )
+void lieqsys::Left( matr const &A, vec const &b, vec &x, uint N )
 {
-  int k;
-
   x[0] = b[0] / A[0][0];
 
-  for (k = 1; k < N; k++)
+  for (uint k = 1; k < N; k++)
   {
-    int j;
     double p = 0;
 
-    for (j = 0; j < k; j++)
+    for (uint j = 0; j < k; j++)
       p += A[k][j] * x[j];
 
     x[k] = (b[k] - p) / A[k][k];
@@ -63,18 +60,15 @@ void lieqsys::Left( matr const &A, vec const &b, vec &x, int N )
  *       std::vector<double> &x;
  * RETURNS: None.
  */
-void lieqsys::Right( matr const &A, vec const &b, vec &x, int N )
+void lieqsys::Right( matr const &A, vec const &b, vec &x, uint N )
 {
-  int k;
-
   x[N - 1] = b[N - 1] / A[N - 1][N - 1];
 
-  for (k = N - 2; k >= 0; k--)
+  for (int k = N - 2; k >= 0; k--)
   {
-    int j;
     double p = 0;
 
-    for (j = k + 1; j < N; j++)
+    for (int j = k + 1; j < N; j++)
       p += A[k][j] * x[j];
 
     x[k] = (b[k] - p) / A[k][k];

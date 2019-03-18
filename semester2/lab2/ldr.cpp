@@ -20,7 +20,7 @@ void lieqsys::LDLTDecomposition( matr const &A,
                        matr &D,
                        matr &R )
 {
-  int  N = A.getH();
+  uint N = A.getH();
 
   /* Variables for LDR */
   vec f(N), g(N), x(N), y(N);
@@ -36,13 +36,13 @@ void lieqsys::LDLTDecomposition( matr const &A,
   D[0][0] = A[0][0];
   R[0][0] = 1;
 
-  for (int k = 2; k <= N; k++)
+  for (uint k = 2; k <= N; k++)
   {
     /* Fill g_k-1T */
-    for (int i = 0; i < k - 1; i++)
+    for (uint i = 0; i < k - 1; i++)
       g[i] = A[k - 1][i];
     /* Fill f_k-1 */
-    for (int i = 0; i < k - 1; i++)
+    for (uint i = 0; i < k - 1; i++)
       f[i] = A[i][k - 1];
 
     /*** Set Lk ***/
@@ -50,34 +50,25 @@ void lieqsys::LDLTDecomposition( matr const &A,
     mth::lieqsys::Left(R.transposing() * D.transposing(),
       g, x, k - 1);
 
-    for (int i = 0; i < k - 1; i++)
+    for (uint i = 0; i < k - 1; i++)
     {
       L[k - 1][i] = x[i];
       L[i][k - 1] = 0;
     }
     L[k - 1][k - 1] = 1;
 
-    /*** Set Rk ***/
-    /* Solve Y */
-    mth::lieqsys::Left(L * D, f, y, k - 1);
-
-    for (int i = 0; i < k - 1; i++)
-    {
-      R[i][k - 1] = y[i];
-      R[k - 1][i] = 0;
-    }
-    R[k - 1][k - 1] = 1;
-
     /*** Set Dk ***/
     /* Solve beta */
     beta = A[k - 1][k - 1] - (x * D) * y;
-    for (int i = 0; i < k - 1; i++)
+    for (uint i = 0; i < k - 1; i++)
     {
       D[i][k - 1] = 0;
       D[k - 1][i] = 0;
     }
     D[k - 1][k - 1] = beta;
   }
+
+  R = L.transposing();
 } /* End of 'LDRDecomposition' function */
 
 /* LDR solve function.

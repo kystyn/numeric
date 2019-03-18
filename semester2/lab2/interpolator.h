@@ -23,7 +23,7 @@ private:
   distribution GridX;
   value_distribution GridY;
 
-  std::vector<double> Weights;
+  distribution Weights;
 
   std::vector<double> PolinomialCoeffs;
   size_t PolinomDimension;
@@ -61,11 +61,16 @@ public:
     return *this;
   }
 
-  least_square_interpolator & setBasisFunc( basis_func F, size_t PolinomDim ) {
+  least_square_interpolator & setBasisFunc( basis_func F, size_t PolinomDim = 0 ) {
     BasisFunc = F;
     PolinomDimension = PolinomDim;
 
     return *this;
+  }
+  least_square_interpolator & setPolyDimension( size_t PolinomDim ) {
+      PolinomDimension = PolinomDim;
+
+      return *this;
   }
 
   least_square_interpolator & setGrid( distribution &NewGridX ) {
@@ -85,10 +90,9 @@ public:
       if (PolinomDimension > GridX.NodeCount)
           throw "There should be less weights than grid nodes";
 
-      if (Weights.size() != GridX.NodeCount)
+      if (Weights.NodeCount != GridX.NodeCount)
           throw "There should be the same quantity of weights as grid size";
 
-      int steps;
       mth::matr A(PolinomDimension);
       mth::vec b(PolinomDimension);
 
@@ -106,7 +110,6 @@ public:
       mth::matr L, D, R;
       mth::lieqsys::LDLTDecomposition(A, L, D, R);
       PolinomialCoeffs = mth::lieqsys::LDRSolve(L, D, R, b);
-      double len = !(A * PolinomialCoeffs -  b);
       ///mth::lieqsys::Relax(A, b, mth::vec(b.getN(), 0), 1.2, Tolerance, steps);
   }
 

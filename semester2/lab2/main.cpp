@@ -7,13 +7,7 @@ using namespace std;
 
 int main()
 {
-    pow(1, 0);
     try {
-        constexpr int dim = 12;
-        constexpr int nodes = 101;
-        auto Func = [] ( double x ) {
-            return log(1 + cos(x) * cos(x));
-        };
         auto BasisFunc = [] ( double x, int j ) {
             //return cos(j * acos(0.6 + 0.5 * x));
             double r = 1;
@@ -21,17 +15,34 @@ int main()
                 r *= x;
             return r;
         };
-        least_square_interpolator i(Func, BasisFunc, dim, uniform(0.1, 1.1, nodes));
-        i.setWeights(std::vector<double>(nodes, 1)).genPolinom();
 
-        std::cout << "Deviation = " << !i << std::endl;
+        controller c(BasisFunc, "lsm.in");
 
-        controller c([]( double x, int j ) { return pow(x, j); }, dim, "lsm.in");
+        auto normalDistribution = [] ( double mu, double sigma, double x ) {
+            double
+                    pi = acos(-1),
+                    e = (x - mu) / sigma;
+
+            return exp(-e * e / 2) / sqrt(2 * pi * sigma);
+        };
+
+        c.
+            addGrid('U', shared_ptr<uniform>(new uniform)).
+            addGrid('R', shared_ptr<class random>(new class random)).
+            addGrid('C', shared_ptr<chebyshev>(new chebyshev));
 
 
-        c['U'] = new uniform();
-        c['R'] = new class random();
-        c['C'] = new chebyshev();
+        auto normDistr = shared_ptr<normal>(new normal(normalDistribution));
+        c.addWeightDistribution('U', shared_ptr<uniform>(new uniform(1, 1)));
+
+        normDistr->makeBegin();
+        c.addWeightDistribution('B', normDistr);
+
+        normDistr->makeMid();
+        c.addWeightDistribution('M', normDistr);
+
+        normDistr->makeEnd();
+        c.addWeightDistribution('E', normDistr);
 
         c << controller::nonDiffFunc << controller::diffFunc;
 

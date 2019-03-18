@@ -8,8 +8,6 @@
 
 #include "def.h"
 
-class interpolator;
-
 class distribution {
 public:
   double a, b;
@@ -28,13 +26,22 @@ public:
 
   virtual distribution & eval( void ) { return *this; }
 
-  distribution & setBorders( double newA, double newB, size_t newNodeCount ) {
+  distribution & setBorders( double newA, double newB, size_t newNodeCount = 1 ) {
     a = newA;
     b = newB;
     NodeCount = newNodeCount;
     Grid.resize(NodeCount);
 
+    NeedEvalGrid = true;
+
     return *this;
+  }
+
+  distribution & setBorders( size_t newNodeCount ) {
+      NodeCount = newNodeCount;
+      Grid.resize(NodeCount);
+
+      return *this;
   }
 
   double operator[]( uint i ) const {
@@ -51,7 +58,7 @@ public:
 class uniform : public distribution {
 public:
   uniform( void ) {}
-  uniform( double a, double b, size_t NodeCount ) : distribution(a, b, NodeCount) { eval(); }
+  uniform( double a, double b, size_t NodeCount = 1 ) : distribution(a, b, NodeCount) { eval(); }
 
   distribution & eval( void ) {
     double h = (b - a) / (double)(NodeCount - 1);
@@ -119,6 +126,10 @@ public:
     distribution(DistrX.a, DistrX.b, DistrX.NodeCount), F(F), DistrX(DistrX) { eval(); }
 
   distribution & eval( void ) {
+
+    if (F == nullptr)
+        throw "Function should be initialized first";
+
     std::vector<double>::const_iterator itX;
     std::vector<double>::iterator itY;
     for (itX = DistrX().begin(),
@@ -130,3 +141,48 @@ public:
 
   ~value_distribution( void ) {}
 };
+
+class normal : public distribution {
+private:
+    function<double(double, double, double)> Function;
+    double &mu, sigma;
+    double mid;
+public:
+  normal( void ) : mu(a), sigma(1) {}
+  normal( function<double(double, double, double)> F ) : Function(F), mu(a), sigma(1) {}
+  normal( double a, double b, size_t NodeCount ) : distribution(a, b, NodeCount), mu(this->a), sigma(1) { eval(); }
+
+  normal & makeBegin( void ) {
+      mu = a;
+      sigma = 1;
+      return *this;
+  }
+
+  normal & makeMid( void ) {
+      mu = mid;
+      sigma = 1;
+      return *this;
+  }
+
+  normal & makeEnd( void ) {
+      mu = b;
+      sigma = 1;
+      return *this;
+  }
+
+  distribution & eval( void ) {
+
+    double h = (b - a) / (double)(NodeCount - 1);
+    int i = 1;
+
+    mid = (a + b) / 2.0;
+
+    for (auto &g : Grid)
+      g = Function(mu, sigma, h * i++);
+
+    NeedEvalGrid = false;
+
+    return *this;
+  }
+};
+

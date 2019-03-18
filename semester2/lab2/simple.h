@@ -17,7 +17,7 @@ namespace lieqsys
  *       std::vector<double> &x;
  * RETURNS: None.
  */
-void Diagonal( matr const &A, vec const &b, vec &x, int N );
+void Diagonal( matr const &A, vec const &b, vec &x, uint N );
 
 /* Left diagonal system solve function.
  * ARGUMENTS:
@@ -31,7 +31,7 @@ void Diagonal( matr const &A, vec const &b, vec &x, int N );
  *       std::vector<double> &x;
  * RETURNS: None.
  */
-void Left( matr const &A, vec const &b, vec &x, int N );
+void Left( matr const &A, vec const &b, vec &x, uint N );
 
 /* Right diagonal system solve function.
  * ARGUMENTS:
@@ -45,6 +45,6 @@ void Left( matr const &A, vec const &b, vec &x, int N );
  *       std::vector<double> &x;
  * RETURNS: None.
  */
-void Right( matr const &A, vec const &b, vec &x, int N );
+void Right( matr const &A, vec const &b, vec &x, uint N );
 }
 }
