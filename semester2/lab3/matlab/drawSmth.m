@@ -1,6 +1,6 @@
-function drawSmth( X, Y, style, titl )
-  semilogy(X, Y, style);
+function drawSmth( X, Y, style, titl, xl, yl )
+  loglog(X, Y, style);
   title(titl);
-  xlabel('Node count');
-  ylabel('Deviation');
+  xlabel(xl);
+  ylabel(yl);
 end

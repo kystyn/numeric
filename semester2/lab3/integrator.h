@@ -1,6 +1,7 @@
 #ifndef INTEGRATOR_H
 #define INTEGRATOR_H
 
+#include <memory>
 #include "def.h"
 #include "distribution.h"
 
@@ -23,23 +24,25 @@ public:
     }
 
     integral & setBorders( double a, double b ) {
-        DistrY.setGridX().setBorders(a, b);
+        DistrY.setBorders(a, b);
         return *this;
     }
 
-    integral & setGrid( distribution const &NewDistrX ) {
+protected:
+    integral & setGrid( shared_ptr<distribution> NewDistrX ) {
         DistrY.setGridX(NewDistrX);
         isSetGridX = true;
         return *this;
     }
 
+public:
     integral & setTollerance( double T ) {
         Tollerance = T;
         return *this;
     }
 
     integral & setGridStep( size_t Step ) {
-        DistrY.setGridX().setBorders(Step).eval();
+        DistrY.setBorders(Step).eval();
 
         return *this;
     }
@@ -53,7 +56,9 @@ private:
     uint Fragmentation;
 
 public:
-    trapezium_integral( void ) {}
+    trapezium_integral( void ) {
+      setGrid(shared_ptr<uniform>(new uniform()));
+    }
 
     /* eval integral */
     double operator()( void ) {
@@ -86,7 +91,7 @@ public:
             integralWithStepx2 = eval();
         }
 
-        return integralWithStep;
+        return integralWithStepx2;
     }
 
     uint getFragmentation( void ) const {

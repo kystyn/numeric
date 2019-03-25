@@ -25,14 +25,14 @@ public:
   double getB( void ) const { return b; }
   size_t getNodeCount( void ) const { return NodeCount; }
 
-  distribution & setBorders( double newA, double newB ) {
+  virtual distribution & setBorders( double newA, double newB ) {
     a = newA;
     b = newB;
 
     return *this;
   }
 
-  distribution & setBorders( size_t newNodeCount ) {
+  virtual distribution & setBorders( size_t newNodeCount ) {
       NodeCount = newNodeCount;
 
       return *this;
@@ -128,20 +128,33 @@ public:
 class value_distribution : public distribution {
 private:
   func F;
-  distribution DistrX;
+  shared_ptr<distribution> DistrX;
 public:
-  value_distribution( void ) : F(nullptr) {}
+  value_distribution( void ) : F(nullptr), DistrX(nullptr) {}
 
-  value_distribution( distribution const &DistrX, func F ) :
-    distribution(DistrX.getA(), DistrX.getB(), DistrX.getNodeCount()), F(F), DistrX(DistrX) { /*f (F != nullptr) eval();*/ }
+  value_distribution( shared_ptr<distribution> DistrX, func F ) :
+    distribution(DistrX->getA(), DistrX->getB(), DistrX->getNodeCount()), F(F), DistrX(DistrX) { /*f (F != nullptr) eval();*/ }
 
-  value_distribution & setGridX( distribution const &NewDistrX ) {
+  value_distribution & setGridX( shared_ptr<distribution> NewDistrX ) {
       DistrX = NewDistrX;
       return *this;
   }
 
-  distribution & setGridX( void ) {
-      return DistrX;
+  distribution & setBorders( double newA, double newB ) {
+    a = newA;
+    b = newB;
+
+    DistrX->setBorders(newA, newB);
+
+    return *this;
+  }
+
+  distribution & setBorders( uint newNodeCount ) {
+    NodeCount = newNodeCount;
+
+    DistrX->setBorders(newNodeCount);
+
+    return *this;
   }
 
   value_distribution & setFunc( func Fun ) {
@@ -150,13 +163,14 @@ public:
   }
 
   distribution & eval( void ) {
+      DistrX->eval();
       return *this;
   }
 
   double operator[]( uint i ) const {
       if (F == nullptr)
           throw "Set function!";
-      return F(DistrX[i]);
+      return F((*DistrX)[i]);
   }
 
   ~value_distribution( void ) {}
