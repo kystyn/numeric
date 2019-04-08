@@ -25,21 +25,20 @@ public:
   double getB( void ) const { return b; }
   size_t getNodeCount( void ) const { return NodeCount; }
 
-  distribution & setBorders( double newA, double newB ) {
+  virtual distribution & setBorders( double newA, double newB ) {
     a = newA;
     b = newB;
 
     return *this;
   }
 
-  distribution & setBorders( size_t newNodeCount ) {
+  virtual distribution & setBorders( size_t newNodeCount ) {
       NodeCount = newNodeCount;
 
       return *this;
   }
 
-  virtual double operator[]( uint i ) const { return 0; }
-
+  virtual double operator[]( uint i ) const { return i; }
 
   virtual ~distribution() {}
 };
@@ -128,21 +127,37 @@ public:
 class value_distribution : public distribution {
 private:
   func F;
-  distribution DistrX;
+  shared_ptr<distribution> DistrX;
 public:
-  value_distribution( void ) : F(nullptr) {}
+  value_distribution( void ) : F(nullptr), DistrX(nullptr) {}
 
-  value_distribution( distribution const &DistrX, func F ) :
-    distribution(DistrX.getA(), DistrX.getB(), DistrX.getNodeCount()), F(F), DistrX(DistrX) { /*f (F != nullptr) eval();*/ }
+  value_distribution( shared_ptr<distribution> DistrX, func F ) :
+    distribution(DistrX->getA(), DistrX->getB(), DistrX->getNodeCount()), F(F), DistrX(DistrX) { /*f (F != nullptr) eval();*/ }
 
-  value_distribution & setGridX( distribution const &NewDistrX ) {
+  value_distribution & setGridX( shared_ptr<distribution> NewDistrX ) {
       DistrX = NewDistrX;
       return *this;
   }
 
-  distribution & setGridX( void ) {
-      return DistrX;
+  distribution & setBorders( double newA, double newB ) {
+    a = newA;
+    b = newB;
+
+    DistrX->setBorders(newA, newB);
+
+    return *this;
   }
+
+  distribution & setBorders( size_t newNodeCount ) override {
+    NodeCount = newNodeCount;
+
+    DistrX->setBorders(newNodeCount);
+    DistrX->eval();
+
+    return *this;
+  }
+
+  distribution const & X() const { return *DistrX; }
 
   value_distribution & setFunc( func Fun ) {
       F = Fun;
@@ -150,13 +165,14 @@ public:
   }
 
   distribution & eval( void ) {
+      DistrX->eval();
       return *this;
   }
 
   double operator[]( uint i ) const {
       if (F == nullptr)
           throw "Set function!";
-      return F(DistrX[i]);
+      return F((*DistrX)[i]);
   }
 
   double operator()( double X ) const {

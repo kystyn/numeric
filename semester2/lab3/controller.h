@@ -1,10 +1,11 @@
 #pragma once
 
-#include <map>
 #include <fstream>
 #include <string>
 #include <random>
 #include <memory>
+#include <vector>
+
 #include "distribution.h"
 #include "integrator.h"
 
@@ -15,7 +16,7 @@ struct data {
 
   data( void ) : a(0), b(0), funcT(0), Tollerance(1e-16) {}
 
-  data( double a, double b, uint funcT, uint Tollerance ) :
+  data( double a, double b, uint funcT, double Tollerance ) :
     a(a), b(b),
     funcT(funcT), Tollerance(Tollerance) {}
 };
@@ -25,7 +26,7 @@ private:
   rado_integral_n2 i;
 
   vector<func> availableFunctions;
-  vector<data> loadedData;
+  vector<struct data> loadedData;
 
   controller & loadFromFile( const char *fileName ) {
     ifstream f(fileName);
@@ -33,13 +34,13 @@ private:
     for (int i = 0; ; i++) {
       double a, b;
       uint funcT;
-      uint tollerance;
+      double tollerance;
 
       if (f >> a)
         f >> b >> funcT >> tollerance;
       else
         break;
-      loadedData.push_back(data(a, b, funcT, tollerance));
+      loadedData.push_back(data(a, b, funcT, pow(10, tollerance)));
     }
 
     return *this;

@@ -1,6 +1,7 @@
 #ifndef INTEGRATOR_H
 #define INTEGRATOR_H
 
+#include <memory>
 #include "def.h"
 #include "distribution.h"
 
@@ -9,12 +10,6 @@ protected:
     func Function;
     value_distribution DistrY;
     double Tollerance;
-
-    integral & setGridStep( size_t Step ) {
-        DistrY.setGridX().setBorders(Step).eval();
-
-        return *this;
-    }
 
 private:
     bool isSetGridX;
@@ -29,23 +24,31 @@ public:
     }
 
     integral & setBorders( double a, double b ) {
-        DistrY.setGridX().setBorders(a, b);
+        DistrY.setBorders(a, b);
         return *this;
     }
 
-    integral & setGrid( distribution const &NewDistrX ) {
+protected:
+    integral & setGrid( shared_ptr<distribution> NewDistrX ) {
         DistrY.setGridX(NewDistrX);
         isSetGridX = true;
         return *this;
     }
 
+    integral & setGridStep( size_t Step ) {
+        DistrY.setBorders(Step).eval();
+
+        return *this;
+    }
+
+public:
     integral & setTollerance( double T ) {
         Tollerance = T;
         return *this;
     }
 
     /* eval integral */
-    virtual double operator()( void ) {}
+    virtual double operator()( void ) { return 0; }
 };
 
 class trapezium_integral : public integral {
@@ -54,7 +57,9 @@ private:
     func f;
 
 public:
-    trapezium_integral( void ) {}
+    trapezium_integral( void ) {
+      setGrid(shared_ptr<uniform>(new uniform()));
+    }
 
     /* eval integral */
     double operator()( void ) {
@@ -87,7 +92,7 @@ public:
             integralWithStepx2 = eval();
         }
 
-        return integralWithStep;
+        return integralWithStepx2;
     }
 
     uint getFragmentation( void ) const {
@@ -100,12 +105,12 @@ private:
     uint Fragmentation;
 
 public:
-    rado_integral_n2( void ) { DistrY.setGridX(uniform()); }
+    rado_integral_n2( void ) { setGrid(shared_ptr<uniform>(new uniform())); }
 
     /* eval integral */
     double operator()( void ) {
         double
-                B1 = 2 /9.0,
+                B1 = 2 / 9.0,
                 x1 = -0.289897948556636,
                 x2 = 0.689897948556636,
                 A1 = 1.024971652376843,
@@ -127,8 +132,8 @@ public:
             double h = (DistrY.getB() - DistrY.getA()) / DistrY.getNodeCount();
 
             for (uint i = 1; i < DistrY.getNodeCount(); i++) {
-                resA1 += Function(h / 2.0 * x1 + (DistrY.setGridX()[i - 1] + DistrY.setGridX()[i]) / 2.0);
-                resA2 += Function(h / 2.0 * x2 + (DistrY.setGridX()[i - 1] + DistrY.setGridX()[i]) / 2.0);
+                resA1 += Function(h / 2.0 * x1 + (DistrY.X()[i - 1] + DistrY.X()[i]) / 2.0);
+                resA2 += Function(h / 2.0 * x2 + (DistrY.X()[i - 1] + DistrY.X()[i]) / 2.0);
             }
 
             resA1 *= A1;
@@ -143,14 +148,14 @@ public:
         DistrY.setBorders(Fragmentation);
         integralWithStepx2 = eval();
 
-        for(;fabs(integralWithStepx2 - integralWithStep) * 1 / 33.0 > Tollerance; Fragmentation <<= 1) {
+        for(;fabs(integralWithStepx2 - integralWithStep) > 7 * Tollerance;) {
 
             integralWithStep = integralWithStepx2;
-            DistrY.setBorders(Fragmentation << 1);
+            DistrY.setBorders(Fragmentation <<= 1);
             integralWithStepx2 = eval();
         }
 
-        return integralWithStep;
+        return integralWithStepx2;
     }
 
     uint getFragmentation( void ) const {
