@@ -159,6 +159,10 @@ public:
       return F(DistrX[i]);
   }
 
+  double operator()( double X ) const {
+      return F(X);
+  }
+
   ~value_distribution( void ) {}
 };
 

@@ -5,3 +5,9 @@ CONFIG -= qt
 
 SOURCES += \
         main.cpp
+
+HEADERS += \
+    distribution.h \
+    def.h \
+    integrator.h \
+    controller.h

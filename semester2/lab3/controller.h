@@ -22,7 +22,7 @@ struct data {
 
 class controller {
 private:
-  trapezium_integral i;
+  rado_integral_n2 i;
 
   vector<func> availableFunctions;
   vector<data> loadedData;
