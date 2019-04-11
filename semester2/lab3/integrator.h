@@ -124,7 +124,7 @@ public:
             double res = 0, resA1 = 0, resA2 = 0, resB = prevB;
 
             for (uint i = 1; i < DistrY.getNodeCount(); i += 2)
-                resB += DistrY[i];
+                resB += Function(DistrY.X()[i]);
 
             prevB = resB;
             resB *= B1;
@@ -148,7 +148,7 @@ public:
         DistrY.setBorders(Fragmentation);
         integralWithStepx2 = eval();
 
-        for(;fabs(integralWithStepx2 - integralWithStep) > 7 * Tollerance;) {
+        for(;fabs(integralWithStepx2 - integralWithStep) > Tollerance;) {
 
             integralWithStep = integralWithStepx2;
             DistrY.setBorders(Fragmentation <<= 1);

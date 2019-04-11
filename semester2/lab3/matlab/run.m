@@ -9,8 +9,8 @@ function run()
   for funcT = 0 : 1 : 1
     F = fopen('integral.in', 'w');
     for toll = 1 : 1 : N
-      prepare(F, a(funcT + 1), b(funcT + 1), funcT, 10 ^ -toll);
-      tolls(toll) = 10 ^ -toll;
+      prepare(F, a(funcT + 1), b(funcT + 1), 1 - funcT, 10 ^ -toll);
+      tolls(toll) = 10 ^ (0 - toll);
       fact(toll)=1;
     end
     fclose(F);

@@ -72,7 +72,7 @@ public:
 
     for (auto &d : loadedData) {
         auto f = availableFunctions[d.funcT];
-        fs << i.
+        fs << std::scientific << i.
             setBorders(d.a, d.b).
             setTollerance(d.Tollerance).setFunction(f)() << ' ' << i.getFragmentation() << std::endl;
     }
