@@ -1,32 +1,62 @@
 function run()
-  format long;
-  a = [0, -pi / 3];
-  b = [pi / 2, pi / 3];
+    format long;
+    a = 1;
+    b = 3;
+    cp = exp(1);
     
-  N = 8;
-  tolls = zeros(1, N);
-  fact = zeros(1, N);
-  for funcT = 0 : 1 : 1
-    F = fopen('integral.in', 'w');
+    N = 4;
+    tolls = zeros(1, N);
+    drawX = zeros(1, N);
+    drawY = zeros(1, N);
+    drawMinFrag = zeros(1, N);
+    drawMaxFrag = zeros(1, N);
+
+    f = @(x) (exp(x) * (log(x) + 1));
     for toll = 1 : 1 : N
-      prepare(F, a(funcT + 1), b(funcT + 1), 1 - funcT, 10 ^ -toll);
-      tolls(toll) = 10 ^ (0 - toll);
-      fact(toll)=1;
+      F = fopen('de.in', 'w');
+      prepare(F, a, b, cp, 10 ^ -toll);
+      tolls(toll) = 10 ^ -toll;
+      fclose(F);
+
+      system('lab5.exe');
+      %system('./lab3');
+      [X, Y, minfrag, maxfrag] = fileParser('de.out');
+      drawY(toll) = deviation(Y, f, a, b, maxfrag);
+      drawMinFrag(toll) = minfrag;
+      drawMaxFrag(toll) = maxfrag;
     end
-    fclose(F);
-    
-    %system('lab3.exe');
-    system('./lab3');
-    [X, Y] = fileParser('integral.out');
     
     figure;
-    drawSmth(tolls, abs(X - fact), 'r', strcat('Dependence of fact precision on settable ', char('0' + funcT), '-diff. function'), ...
-    'Settable precision', 'Fact precision');
-    grid on;
+      drawSmth(tolls, drawY, 'r', 'Dependence of fact precision on settable', ...
+      'Settable precision', 'Fact precision');
+      grid on;
+
+      figure;
+      drawSmth(tolls, drawMinFrag, 'r', '', ...
+      'Fact precision', 'Step count');
+      hold on;
+      drawSmth(tolls, drawMaxFrag, 'b', 'Dependence of min/max frag on precision', ...
+      'Fact precision', 'Step count');
+      grid on;
+      hold off;
+    
+    toll = 2;
+    i = 1;
+    for error = -8 : 1 : -1
+      F = fopen('de.in', 'w');
+      prepare(F, a, b, cp * (1 + 10 ^ error), 10 ^ -toll);
+      fclose(F);
+
+      system('lab5.exe');
+      %system('./lab3');
+      [X, Y, minfrag, maxfrag] = fileParser('de.out');
+      drawX(i) = 10 ^ error;
+      drawY(i) = deviation(Y, f, a, b, maxfrag);
+      i = i + 1;
+    end
 
     figure;
-    drawSmth(tolls, Y, 'r', strcat('Dependence of step count on precision ', char('0' + funcT),'-diff. function'), ...
-    'Fact precision', 'Step count');
+    drawSmth(drawX, drawY, 'r', 'Dependence of fact precision on Cauchy problem error', ...
+    'Error', 'Fact precision');
     grid on;
-  end
 end

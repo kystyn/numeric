@@ -178,6 +178,7 @@ public:
 
   tabulated_function & operator<<( double p ) {
     Y.push_back(p);
+    NodeCount = Y.size();
     return *this;
   }
 

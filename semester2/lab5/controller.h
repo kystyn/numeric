@@ -73,10 +73,11 @@ public:
     auto fs = ofstream(fileName);
 
     for (auto &d : loadedData) {
-        fs << std::setprecision(16) << ecs.
+      auto tf = ecs.
             setBorders(d.a, d.b).
             setFunction(funct).setCauchyProblem(d.cauchyProblem).
-            solve(d.Tollerance) << ecs.getFrag() << std::endl;
+            solve(d.Tollerance);
+        fs << std::setprecision(16) << ecs.getMinFrag() << ' ' << ecs.getMaxFrag() << endl << tf << endl;
     }
   }
 };

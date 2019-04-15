@@ -14,17 +14,28 @@ public:
 class euler_cauchy_solver : public diff_equation_solver {
 private:
   double cauchyProblem;
-  uint frag;
+  uint minFrag;
+  uint maxFrag;
 
-  double deviation( distribution const &valDistr1,
+  double maxDeviation( distribution const &valDistr1,
     distribution const &valDistr2 ) const {
 
     double dev = 0;
     for (uint i = 0; i < valDistr1.getNodeCount(); i += 2)
       if (fabs((long double)(valDistr1[i] - valDistr2[i / 2])) > dev)
         dev = fabs((long double)(valDistr1[i] - valDistr2[i / 2]));
-    
+
     return dev;
+  }
+
+  bool reachedMinDeviation( distribution const &valDistr1,
+    distribution const &valDistr2, double tollerance ) const {
+
+    for (uint i = 2; i < valDistr1.getNodeCount(); i += 2)
+      if (fabs((long double)(valDistr1[i] - valDistr2[i / 2])) <= 3 * tollerance)
+        return true;
+
+    return false;
   }
 public:
   euler_cauchy_solver( void ) {}
@@ -58,16 +69,24 @@ public:
     eval(solutionx2);
     solution << solutionx2[0] + 1;
 
-    for (; deviation(solutionx2, solution) > 3 * tollerance;) {
+    bool evalMinDev = true;
+
+    for (; maxDeviation(solutionx2, solution) > 31 * tollerance;) {
+      if (evalMinDev)
+        if (reachedMinDeviation(solutionx2, solution, tollerance)) {
+          evalMinDev = false;
+          minFrag = fragmentation;
+        }
       solution = solutionx2;
       fragmentation <<= 1;
       eval(solutionx2);
     }
 
-    frag = fragmentation;
+    maxFrag = fragmentation;
 
     return solutionx2;
   }
 
-  uint getFrag( void ) const { return frag; }
+  uint getMinFrag( void ) const { return minFrag; }
+  uint getMaxFrag( void ) const { return maxFrag; }
 };
