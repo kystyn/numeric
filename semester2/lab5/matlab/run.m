@@ -19,7 +19,7 @@ function run()
       fclose(F);
 
       system('lab5.exe');
-      %system('./lab3');
+      %system('./lab5');
       [X, Y, minfrag, maxfrag] = fileParser('de.out');
       drawY(toll) = deviation(Y, f, a, b, maxfrag);
       drawMinFrag(toll) = minfrag;
@@ -38,6 +38,7 @@ function run()
       drawSmth(tolls, drawMaxFrag, 'b', 'Dependence of min/max frag on precision', ...
       'Fact precision', 'Step count');
       grid on;
+      legend('min', 'max');
       hold off;
     
     toll = 2;
@@ -48,7 +49,7 @@ function run()
       fclose(F);
 
       system('lab5.exe');
-      %system('./lab3');
+      %system('./lab5');
       [X, Y, minfrag, maxfrag] = fileParser('de.out');
       drawX(i) = 10 ^ error;
       drawY(i) = deviation(Y, f, a, b, maxfrag);

@@ -46,6 +46,7 @@ public:
 
   tabulated_function solve( double tollerance ) {
     uint fragmentation = 2;
+    minFrag = fragmentation;
     uniform argDistr(a, b);
     tabulated_function solution, solutionx2;
 
@@ -71,7 +72,7 @@ public:
 
     bool evalMinDev = true;
 
-    for (; maxDeviation(solutionx2, solution) > 31 * tollerance;) {
+    for (; maxDeviation(solutionx2, solution) > 33 * tollerance;) {
       if (evalMinDev)
         if (reachedMinDeviation(solutionx2, solution, tollerance)) {
           evalMinDev = false;
