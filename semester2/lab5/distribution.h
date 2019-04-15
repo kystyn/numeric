@@ -169,9 +169,11 @@ private:
   shared_ptr<distribution> X;
   vector<double> Y;
 public:
+  tabulated_function & setArgumentDistrubution( shared_ptr<distribution> x )  { X = x; return *this; }
   tabulated_function & setFragmentation( uint frag ) {
     X->setBorders(frag);
     X->eval();
+    return *this;
   }
 
   tabulated_function & operator<<( double p ) {

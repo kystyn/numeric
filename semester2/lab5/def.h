@@ -6,6 +6,7 @@
 using namespace std;
 
 using func = function<double(double)>;
+using func2var = function<double(double, double)>;
 
 using uint = unsigned int;
 

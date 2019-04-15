@@ -27,7 +27,7 @@ struct data {
 class controller {
 private:
   euler_cauchy_solver ecs;
-  func funct;
+  func2var funct;
   vector<kyst::data> loadedData;
 
   controller & loadFromFile( const char *fileName ) {
@@ -64,7 +64,7 @@ public:
         loadFromFile(fileName);
   }
 
-  controller & operator<<( func v ) {
+  controller & operator<<( func2var v ) {
     funct = v;
     return *this;
   }

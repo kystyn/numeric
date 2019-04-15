@@ -5,10 +5,10 @@
 
 class diff_equation_solver {
 protected:
-  func funct;
+  func2var funct;
   double a, b;
 public:
-  virtual tabulated_function solve( double tollerance ) {}
+  virtual tabulated_function solve( double tollerance ) = 0;
 };
 
 class euler_cauchy_solver : public diff_equation_solver {
@@ -20,32 +20,38 @@ private:
     distribution const &valDistr2 ) const {
 
     double dev = 0;
-    if (valDistr1.getNodeCount() == 2 * valDistr2.getNodeCount()) {
-      for (uint i = 0; i < valDistr1.getNodeCount(); i += 2)
-        if (fabs(valDistr1[i] - valDistr2[i / 2]) > dev)
-          dev = fabs(valDistr1[i] - valDistr2[i / 2]);
-    }
+    for (uint i = 0; i < valDistr1.getNodeCount(); i += 2)
+      if (fabs((long double)(valDistr1[i] - valDistr2[i / 2])) > dev)
+        dev = fabs((long double)(valDistr1[i] - valDistr2[i / 2]));
+    
     return dev;
   }
 public:
   euler_cauchy_solver( void ) {}
 
   euler_cauchy_solver & setCauchyProblem( double cp ) { cauchyProblem = cp; return *this; }
-  euler_cauchy_solver & setFunction( func f ) { funct = f; return *this; }
+  euler_cauchy_solver & setFunction( func2var f ) { funct = f; return *this; }
   euler_cauchy_solver & setBorders( double a, double b ) { this->a = a; this->b = b; return *this; }
 
   tabulated_function solve( double tollerance ) {
-    uint fragmentation = 1;
+    uint fragmentation = 2;
     uniform argDistr(a, b);
     tabulated_function solution, solutionx2;
 
-    auto eval = [this, fragmentation, &argDistr]( tabulated_function &s ) -> void {
-      double h = (b - a) / fragmentation;
+    solution.setArgumentDistrubution(shared_ptr<distribution>(new uniform(a, b)));
+    solutionx2.setArgumentDistrubution(shared_ptr<distribution>(new uniform(a, b)));
+
+    auto eval = [this, &fragmentation, &argDistr]( tabulated_function &s ) -> void {
+      double h = (b - a) / (fragmentation - 1);
       s.setFragmentation(fragmentation);
+      argDistr.setBorders(fragmentation);
+      argDistr.eval();
       s.clear();
+
       s << cauchyProblem;
-      for (uint i = 1; i < fragmentation - 1; i++)
-        s << s[i - 1] + h / 2 * (funct(argDistr[i - 1]) + funct(argDistr[i]));
+
+      for (uint i = 1; i < fragmentation; i++)
+        s << s[i - 1] + h / 2 * (funct(argDistr[i - 1], s[i - 1]) + funct(argDistr[i], s[i - 1] + h * funct(argDistr[i - 1], s[i - 1])));
 
     };
 
