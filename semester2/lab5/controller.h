@@ -14,13 +14,16 @@ namespace kyst {
 struct data {
   double a, b;
   double cauchyProblem;
+  uint fragmentation;
   double Tollerance;
 
-  data( void ) : a(0), b(0), cauchyProblem(0), Tollerance(1e-16) {}
+  data( void ) : a(0), b(0), cauchyProblem(0),
+      fragmentation(0), Tollerance(1e-16) {}
 
-  data( double a, double b, double cauchyProblem, double Tollerance ) :
-    a(a), b(b),
-    cauchyProblem(cauchyProblem), Tollerance(Tollerance) {}
+  data( double a, double b, double cauchyProblem, uint fragmentation,
+        double Tollerance ) :
+    a(a), b(b), cauchyProblem(cauchyProblem),
+    fragmentation(fragmentation), Tollerance(Tollerance) {}
 };
 }
 
@@ -36,29 +39,20 @@ private:
     for (int i = 0; ; i++) {
       double a, b;
       double cp;
+      uint frag;
       double tollerance;
 
       if (f >> a)
-        f >> b >> cp >> tollerance;
+        f >> b >> cp >> frag >> tollerance;
       else
         break;
-      loadedData.push_back(kyst::data(a, b, cp, pow(10, tollerance)));
+      loadedData.push_back(kyst::data(a, b, cp, frag, pow(10, tollerance)));
     }
 
     return *this;
   }
 
 public:
-
-  static double diffFunc( double x ) {
-    return sin(x);
-    //return pow(x, 8) + 1;
-  }
-
-  static double nonDiffFunc( double x ) {
-    return fabs(sin(x));
-  }
-
   controller( const char *fileName = nullptr ) {
       if (fileName)
         loadFromFile(fileName);
@@ -76,6 +70,7 @@ public:
       auto tf = ecs.
             setBorders(d.a, d.b).
             setFunction(funct).setCauchyProblem(d.cauchyProblem).
+            setFragmentation(d.fragmentation).
             solve(d.Tollerance);
         fs << std::setprecision(16) << ecs.getMinFrag() << ' ' << ecs.getMaxFrag() << endl << tf << endl;
     }
