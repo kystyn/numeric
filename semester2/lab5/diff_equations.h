@@ -71,9 +71,9 @@ public:
         uint localFrag = 2;
         s2 << solution.get(solution.getNodeCount() - 1);
         auto p = s2.get(0);
-        s1 << make_pair<>(p.first, p.second + 1);
+        s1 << make_pair<>(p.first, p.second + 10 * tollerance);
 
-        for (; deviation(s2, s1) >= 1 * tollerance;) {
+        for (; deviation(s2, s1) >= 3 * tollerance;) {
             s1 = s2;
             eval(funct, s2, interval[i], solution[i], interval[i + 1], localFrag = ((localFrag - 1) << 1) + 1);
         }
