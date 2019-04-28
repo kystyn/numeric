@@ -74,7 +74,7 @@ public:
     return *this;
   }
 
-  double operator[]( uint i ) const {
+  double operator[]( int i ) const {
       return 1;
   }
 };
@@ -166,28 +166,27 @@ public:
 
 class tabulated_function : public distribution {
 private:
-  shared_ptr<distribution> X;
-  vector<double> Y;
+    vector<pair<double, double>> Coordinates;
 public:
-  tabulated_function & setArgumentDistrubution( shared_ptr<distribution> x )  { X = x; return *this; }
-  tabulated_function & setFragmentation( uint frag ) {
-    X->setBorders(frag);
-    X->eval();
-    return *this;
-  }
+    tabulated_function( void ) {}
 
-  tabulated_function & operator<<( double p ) {
-    Y.push_back(p);
-    NodeCount = Y.size();
+  tabulated_function & operator<<( pair<double, double> p ) {
+    Coordinates.push_back(p);
+    NodeCount = Coordinates.size();
     return *this;
   }
 
   double operator[]( uint idx ) const {
-    return Y.at(idx);
+    return Coordinates.at(idx).second;
+  }
+
+  pair<double, double> get( uint idx ) const {
+      return Coordinates.at(idx);
   }
 
   tabulated_function & clear( void ) {
-    Y.clear();
+    Coordinates.clear();
+    NodeCount = 0;
     return *this;
   }
 
