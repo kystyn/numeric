@@ -10,6 +10,8 @@
 #include "distribution.h"
 #include "diff_equations.h"
 
+using namespace std;
+
 namespace kyst {
 struct data {
   double a, b;
@@ -46,7 +48,7 @@ private:
         f >> b >> cp >> frag >> tollerance;
       else
         break;
-      loadedData.push_back(kyst::data(a, b, cp, frag, pow(10, tollerance)));
+      loadedData.push_back(kyst::data(a, b, cp, frag, tollerance));
     }
 
     return *this;
@@ -67,11 +69,11 @@ public:
     auto fs = ofstream(fileName);
 
     for (auto &d : loadedData) {
-      auto tf = ecs.
-            setBorders(d.a, d.b).
-            setFunction(funct).setCauchyProblem(d.cauchyProblem).
-            setFragmentation(d.fragmentation).
-            solve(d.Tollerance);
+      ecs.setBorders(d.a, d.b);
+      ecs.setFunction(funct);
+      ecs.setCauchyProblem(d.cauchyProblem);
+      ecs.setFragmentation(d.fragmentation);
+      auto tf = ecs.solve(d.Tollerance);
         fs << std::setprecision(16) << ecs.getMinFrag() << ' ' << ecs.getMaxFrag() << endl << tf << endl;
     }
   }

@@ -12,16 +12,17 @@ function run()
     drawMaxFrag = zeros(1, N);
 
     f = @(x) (exp(x) .* (log(x) + 1));
+    %f = @(x) (x * x);
     for toll = 1 : 1 : N
       F = fopen('de.in', 'w');
       prepare(F, a, b, cp, 10 ^ -toll);
       tolls(toll) = 10 ^ -toll;
       fclose(F);
 
-      %system('lab5.exe');
-      system('./lab5');
+      system('lab5.exe');
+      %system('./lab5');
       [X, Y, minfrag, maxfrag, N] = fileParser('de.out');
-      drawY(toll) = deviation(Y, X, f, a, b, N);
+      drawY(toll) = deviation(Y, X, f, N);
       drawMinFrag(toll) = minfrag;
       drawMaxFrag(toll) = maxfrag;
     end
@@ -43,16 +44,16 @@ function run()
     
     toll = 6;
     i = 1;
-    for error = -8 : 1 : -1
+    for error = -N : 1 : -1
       F = fopen('de.in', 'w');
       prepare(F, a, b, cp * (1 + 10 ^ error), 10 ^ -toll);
       fclose(F);
 
-      %system('lab5.exe');
-      system('./lab5');
+      system('lab5.exe');
+      %system('./lab5');
       [X, Y, minfrag, maxfrag, N] = fileParser('de.out');
       drawX(i) = 10 ^ error;
-      drawY(i) = deviation(Y, X, f, a, b, N);
+      drawY(i) = deviation(Y, X, f, N);
       i = i + 1;
     end
 
