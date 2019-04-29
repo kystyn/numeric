@@ -190,6 +190,12 @@ public:
     return *this;
   }
 
+  tabulated_function & pop( void ) {
+    Coordinates.pop_back();
+    NodeCount--;
+    return *this;
+  }
+
   friend std::ostream & operator<<( std::ostream &os, tabulated_function const &tf );
 };
 

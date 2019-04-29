@@ -22,7 +22,10 @@ int main()
 
     std::cout << tf;*/
     controller c("de.in");
-    c << []( double x, double y ) -> double { return exp(x) / x + y; };
+
+    std::cout << std::setprecision(16) << kystyn::exp(1, 1e-14);
+
+    c << []( double x, double y ) -> double { return kystyn::exp(x, 1e-14) / x + y; };
     c.run("de.out");
 
     return 0;
