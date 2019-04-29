@@ -1,3 +1,3 @@
-function prepare(F, a, b, cp, tollerance )
-    fprintf(F, '%1.16f %1.16f %1.16f %i %f\n', a, b, cp, 10, log10(tollerance));
+function prepare(F, t, a, b, cp, tollerance )
+    fprintf(F, '%i %1.16f %1.16f %1.16f %i %1.16f\n', t, a, b, cp, 10, tollerance);
 end
