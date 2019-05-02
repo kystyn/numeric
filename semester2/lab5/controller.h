@@ -88,7 +88,7 @@ public:
       ecs->setCauchyProblem(d.cauchyProblem);
       ecs->setFragmentation(d.fragmentation);
       auto tf = ecs->solve(d.Tollerance);
-        fs << std::setprecision(16) << ecs->getMinFrag() << ' ' << ecs->getMaxFrag() << endl << tf << endl;
+        fs << std::setprecision(16) << ecs->getFrag() << ' ' << ecs->getMinFrag() << ' ' << ecs->getMaxFrag() << endl << tf << endl;
     }
   }
 };

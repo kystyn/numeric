@@ -8,6 +8,7 @@ function run()
     tolls = zeros(1, N);
     drawX = zeros(1, N);
     drawY = zeros(2, N);
+    drawFrag = zeros(2, N);
     drawMinFrag = zeros(2, N);
     drawMaxFrag = zeros(2, N);
 
@@ -20,22 +21,23 @@ function run()
           tolls(toll) = 10 ^ -toll;
           fclose(F);
 
-          system('lab5.exe');
-          %system('./lab5');
-          [X, Y, minfrag, maxfrag, fr] = fileParser('de.out');
+          %system('lab5.exe');
+          system('./lab5');
+          [X, Y, frag, minfrag, maxfrag, fr] = fileParser('de.out');
           drawY(t, toll) = deviation(Y, X, f, fr);
           drawMinFrag(t, toll) = minfrag;
           drawMaxFrag(t, toll) = maxfrag;
+          drawFrag(t, toll) = frag;
         end
     end
     
     figure;
-    drawSmth(tolls, drawY(1, 1 : N), 'r', 'Dependence of fact precision on settable', ...
-            'Settable precision', 'Fact precision');
+    drawSmth(drawFrag(1, 1 : N), drawY(1, 1 : N), 'r', 'Dependence of fact precision on fragmentation', ...
+            'Fragmentation', 'Fact precision');
     grid on;
     hold on;
-    drawSmth(tolls, drawY(2, 1 : N), 'g', 'Dependence of fact precision on settable', ...
-            'Settable precision', 'Fact precision');
+    drawSmth(drawFrag(2, 1 : N), drawY(2, 1 : N), 'g', 'Dependence of fact precision on fragmentation', ...
+            'Fragmentation', 'Fact precision');
     legend('E', 'I');
 
     figure;
@@ -52,7 +54,7 @@ function run()
     legend('min E', 'min I', 'max E', 'max I');
     hold off;
     
-    toll = 6;
+    toll = 4;
     for t = 1 : 1 : 2
         i = 1;
         for error = -N : 1 : -1
@@ -60,9 +62,9 @@ function run()
           prepare(F, t, a, b, cp * (1 + 10 ^ error), 10 ^ -toll);
           fclose(F);
 
-          system('lab5.exe');
-          %system('./lab5');
-          [X, Y, minfrag, maxfrag, fr] = fileParser('de.out');
+          %system('lab5.exe');
+          system('./lab5');
+          [X, Y, frag, minfrag, maxfrag, fr] = fileParser('de.out');
           drawX(i) = 10 ^ error;
           drawY(t, i) = deviation(Y, X, f, fr);
           i = i + 1;

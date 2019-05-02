@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "def.h"
 #include "distribution.h"
 
@@ -7,6 +9,7 @@ class diff_equation_solver {
 protected:
   uint minFrag;
   uint maxFrag;
+  uint frag;
   func2var funct;
   double a, b;
   double cauchyProblem;
@@ -14,11 +17,13 @@ protected:
 public:
   uint getMinFrag( void ) const { return minFrag; }
   uint getMaxFrag( void ) const { return maxFrag; }
+  uint getFrag( void ) const { return frag; }
 
   static double deviation( distribution const &valDistr1,
     distribution const &valDistr2 ) {
 
-    return fabs(valDistr1[valDistr1.getNodeCount() - 1] - valDistr2[valDistr2.getNodeCount() - 1]);
+    return fabs(valDistr1[valDistr1.getNodeCount() - 1] - valDistr2[valDistr2.getNodeCount() - 1]) *
+            std::min(valDistr1[valDistr1.getNodeCount() - 1], valDistr2[valDistr2.getNodeCount() - 1]);
   }
 
   virtual tabulated_function solve( double tollerance ) = 0;
@@ -95,7 +100,7 @@ class explicit_adams_solver : public diff_equation_solver {
 public:
   explicit_adams_solver( void ) {}
 
-  void eval( func2var funct, tabulated_function &s, double x1, double cp, double x2, uint localFrag ) {
+  static void eval( func2var funct, tabulated_function &s, double x1, double cp, double x2, uint localFrag ) {
     uniform argDistr(x1, x2);
     argDistr.setBorders(localFrag);
     argDistr.eval();
@@ -116,6 +121,7 @@ public:
     tabulated_function solution;
     minFrag = 0xFFFFFFFF;
     maxFrag = 0;
+    frag = 0;
 
     solution << make_pair<>(a, cauchyProblem);
 
@@ -135,6 +141,8 @@ public:
             minFrag = s2.getNodeCount();
         if (s2.getNodeCount() > maxFrag)
             maxFrag = s2.getNodeCount();
+
+        frag += s2.getNodeCount();
 
         solution << s2.get(s2.getNodeCount() - 1);
     }
@@ -160,8 +168,8 @@ public:
 
     for (uint i = 1; i < localFrag; i++) {
       tabulated_function RKsol;
-      euler_cauchy_solver::eval(funct, RKsol, argDistr[i - 1], s.get(s.getNodeCount() - 1).second, argDistr[i], 2);
-      auto yi = RKsol[1];
+      euler_cauchy_solver::eval(funct, RKsol, argDistr[i - 1], s[i - 1], argDistr[i], 3);
+      auto yi = RKsol[2];
       s << make_pair<>(argDistr[i],
         s[i - 1] + h / 2 * (funct(argDistr[i], yi) + funct(argDistr[i - 1], s[i - 1])));
 
@@ -172,6 +180,7 @@ public:
     tabulated_function solution;
     minFrag = 0xFFFFFFFF;
     maxFrag = 0;
+    frag = 0;
 
     solution << make_pair<>(a, cauchyProblem);
 
@@ -191,6 +200,8 @@ public:
             minFrag = s2.getNodeCount();
         if (s2.getNodeCount() > maxFrag)
             maxFrag = s2.getNodeCount();
+
+        frag += s2.getNodeCount();
 
         solution << s2.get(s2.getNodeCount() - 1);
     }
