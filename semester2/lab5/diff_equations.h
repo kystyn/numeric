@@ -297,8 +297,6 @@ public:
 
   tabulated_function solve( double tollerance ) override {
       tabulated_function solution;
-      minFrag = 0xFFFFFFFF;
-      maxFrag = 0;
       frag = 0;
     
       vector<double> s1, s2;
@@ -323,6 +321,8 @@ public:
           g2.setBorders((interval.getNodeCount() - 1) * localFrag + 1);
           g2.eval();
       }
+
+      frag = g2.getNodeCount();
 
       for (uint i = 0; i < s2.size(); i += (s2.size() - 1) / (interval.getNodeCount() - 1))
         solution << make_pair<>(interval[i / ((s2.size() - 1) / (interval.getNodeCount() - 1))], vector<double>{s2[i]});

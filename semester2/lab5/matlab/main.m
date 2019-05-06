@@ -1,3 +1,3 @@
 function main()
-  run();
+  run_boundary();
 end

@@ -1,4 +1,4 @@
-function run()
+function run_cauchy()
     format long;
     a = 1;
     b = 3;
