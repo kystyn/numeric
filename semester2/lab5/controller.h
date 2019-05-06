@@ -33,8 +33,8 @@ struct data {
 class controller {
 private:
   //euler_cauchy_solver ecs;
-  std::shared_ptr<diff_equation_solver> ecs;
-  func2var funct;
+  std::shared_ptr<cauchy_problem_solver> ecs;
+  n_func_n_plus_1_var funct;
   vector<kyst::data> loadedData;
 
   controller & loadFromFile( const char *fileName ) {
@@ -63,7 +63,7 @@ public:
         loadFromFile(fileName);
   }
 
-  controller & operator<<( func2var v ) {
+  controller & operator<<( n_func_n_plus_1_var v ) {
     funct = v;
     return *this;
   }
@@ -85,10 +85,10 @@ public:
       }
       ecs->setBorders(d.a, d.b);
       ecs->setFunction(funct);
-      ecs->setCauchyProblem(d.cauchyProblem);
+      ecs->setCauchyProblem({d.cauchyProblem});
       ecs->setFragmentation(d.fragmentation);
       auto tf = ecs->solve(d.Tollerance);
-        fs << std::setprecision(16) << ecs->getMinFrag() << ' ' << ecs->getMaxFrag() << endl << tf << endl;
+        fs << std::setprecision(16) << ecs->getFrag() << ' ' << ecs->getMinFrag() << ' ' << ecs->getMaxFrag() << endl << tf << endl;
     }
   }
 };

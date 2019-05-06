@@ -2,11 +2,15 @@
 #define DEF_H
 
 #include <functional>
+#include <vector>
+
+
+class tabulated_function;
 
 using namespace std;
 
 using func = function<double(double)>;
-using func2var = function<double(double, double)>;
+using n_func_n_plus_1_var = function<vector<double>(double, vector<double> const &)>;
 
 using uint = unsigned int;
 
@@ -40,5 +44,14 @@ inline double log( double x, double tollerance ) {
   return res;
 }
 }
+
+ostream & operator<<( ostream &os, vector<double> const &f );
+std::ostream & operator<<( std::ostream &os, tabulated_function const &tf );
+vector<double> operator*( double h, vector<double> const &f );
+vector<double> operator*( vector<double> const &v1, vector<double> const &v2 );
+vector<double> operator-( vector<double> const &v1, vector<double> const &v2 );
+vector<double> operator+( vector<double> const &v1, vector<double> const &v2 );
+// Chebyshev norm
+double operator!( vector<double> const &v );
 
 #endif // DEF_H

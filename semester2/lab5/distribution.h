@@ -124,6 +124,27 @@ public:
   ~chebyshev( void ) {}
 };
 
+class grid : public distribution {
+public:
+  grid( std::vector<double> const &v = {} ) : Values(v) {
+    NodeCount = v.size();
+  }
+
+  grid & operator<<( double val ) {
+    Values.push_back(val);
+    a = Values[0];
+    b = val;
+    NodeCount = Values.size();
+    return *this;
+  }
+
+  double operator[]( uint i ) const {
+    return Values[i];
+  }
+private:
+  vector<double> Values;
+};
+
 class value_distribution : public distribution {
 private:
   func F;
@@ -164,39 +185,47 @@ public:
   ~value_distribution( void ) {}
 };
 
-class tabulated_function : public distribution {
+class tabulated_function {
 private:
-    vector<pair<double, double>> Coordinates;
+    vector<pair<double, vector<double>>> Coordinates;
+    uint NodeCount;
 public:
     tabulated_function( void ) {}
 
-  tabulated_function & operator<<( pair<double, double> p ) {
-    Coordinates.push_back(p);
-    NodeCount = Coordinates.size();
-    return *this;
-  }
+    uint getNodeCount( void ) const { return NodeCount; }
 
-  double operator[]( uint idx ) const {
-    return Coordinates.at(idx).second;
-  }
+    tabulated_function & operator<<( pair<double, vector<double>> p ) {
+      Coordinates.push_back(p);
+      NodeCount = Coordinates.size();
+      return *this;
+    }
 
-  pair<double, double> get( uint idx ) const {
-      return Coordinates.at(idx);
-  }
+    vector<double> operator[]( uint idx ) const {
+      return Coordinates.at(idx).second;
+    }
 
-  tabulated_function & clear( void ) {
-    Coordinates.clear();
-    NodeCount = 0;
-    return *this;
-  }
+    pair<double, vector<double>> get( uint idx ) const {
+        return Coordinates.at(idx);
+    }
 
-  tabulated_function & pop( void ) {
-    Coordinates.pop_back();
-    NodeCount--;
-    return *this;
-  }
+    tabulated_function & clear( void ) {
+      Coordinates.clear();
+      NodeCount = 0;
+      return *this;
+    }
 
-  friend std::ostream & operator<<( std::ostream &os, tabulated_function const &tf );
+    tabulated_function & pop( void ) {
+      Coordinates.pop_back();
+      NodeCount--;
+      return *this;
+    }
+
+    tabulated_function & reverse( void ) {
+      std::reverse(Coordinates.begin(), Coordinates.end());
+      return *this;
+    }
+
+    friend std::ostream & operator<<( std::ostream &os, tabulated_function const &tf );
 };
 
 

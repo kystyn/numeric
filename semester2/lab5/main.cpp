@@ -1,7 +1,16 @@
 #include <iostream>
 #include "controller.h"
 
+
 using namespace std;
+
+ostream & operator<<( ostream &os, vector<double> const &f ) {
+  for (auto x : f)
+    os << x << ' ';
+  os << endl;
+
+  return os;
+}
 
 std::ostream & operator<<( std::ostream &os, tabulated_function const &tf ) {
   for (auto &c : tf.Coordinates)
@@ -10,23 +19,65 @@ std::ostream & operator<<( std::ostream &os, tabulated_function const &tf ) {
   return os;
 }
 
+vector<double> operator*( double h, vector<double> const &f ) {
+  auto v = f;
+  for (auto &x : v)
+    x *= h;
+  return v;
+}
+
+vector<double> operator*( vector<double> const &v1, vector<double> const &v2 ) {
+  auto v = v1;
+  for (uint i = 0; i < v2.size(); i++)
+    v[i] *= v2[i];
+  return v;
+}
+
+vector<double> operator-( vector<double> const &v1, vector<double> const &v2 ) {
+  auto v = v1;
+
+  for (uint i = 0; i < v2.size(); i++)
+    v[i] -= v2[i];
+
+  return v;
+}
+
+vector<double> operator+( vector<double> const &v1, vector<double> const &v2 ) {
+  auto v = v1;
+
+  for (uint i = 0; i < v2.size(); i++)
+    v[i] += v2[i];
+  return v;
+}
+
+// Chebyshev norm
+double operator!( vector<double> const &v ) {
+  double norm = 0;
+
+  for (auto &x : v)
+    if (fabs(x) > norm)
+      norm = x;
+
+  return norm;
+}
+
 int main()
 {
-    /*
-  euler_cauchy_solver s;
-    auto tf = s.setFunction([]( double x, double y ) { return exp(x) * (log(x) + 1); }).
-      setBorders(1, 3).
-      setFragmentation(5).
-      setCauchyProblem(exp(1)).
-      solve(1e-4);
-
-    std::cout << tf;*/
-    controller c("de.in");
-
+    /*controller c("de.in");
     std::cout << std::setprecision(16) << kystyn::exp(1, 1e-14);
 
-    c << []( double x, double y ) -> double { return kystyn::exp(x, 1e-14) / x + y; };
-    c.run("de.out");
+    c << []( double x, vector<double> const & y ) -> vector<double> { return {kystyn::exp(x, 1e-14) / x + y[0]}; };
+    c.run("de.out");*/
+
+    finite_difference_solver s;
+
+    s.setBorders(uniform(0.2, 1, 5));
+    s.setBoundaryProblem(1, 0, 5, 1, 0, 1);
+    s.setFunction(
+      []( double x ) { return (2 * x + 2) / (2 * x * x + x);},
+      []( double x ) { return -1.0 / (2 * x * x + x);},
+      []( double x ) { return 1 / (x * (2 * x * x + x));});
+    auto sol = s.solve(1e-3);
 
     return 0;
 }

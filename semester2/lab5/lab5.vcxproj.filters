@@ -27,6 +27,9 @@
     <ClInclude Include="diff_equations.h">
       <Filter>Исходные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="interpolator.h">
+      <Filter>Исходные файлы</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
