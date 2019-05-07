@@ -330,47 +330,41 @@ public:
   }
 };
 
-class sweep : public boundary_problem_solver {
+class reductor : public boundary_problem_solver {
 public:
-  sweep( void ) {}
+  reductor( void ) {}
 
   tabulated_function solve( double tollerance ) override {
     euler_cauchy_solver ecs;
     ecs.setBorders(interval);
-    ecs.setCauchyProblem({-alpha0 / alpha1, A / alpha1});
+    ecs.setCauchyProblem({alpha1, -alpha0});
     ecs.setFunction([this]( double x, vector<double> const &y ) {
       std::vector<double> r(2);
-      r[0] = -p(x) * y[0] - y[0] * y[0] - q(x);
-      r[1] = -(p(x) + y[0]) * y[1] + f(x);
+      r[0] = -p(x) * y[0] - q(x) * y[1];
+      r[1] = y[0];
 
       return r;
     });
-    auto tf = ecs.solve(tollerance);
+    auto u = ecs.solve(tollerance);
 
-    interpolator i;
-    uniform backinterval(interval.getB(), interval.getA(), frag);
-    i.setGridX(backinterval);
+    if (fabs(alpha0) >= tollerance)
+        ecs.setCauchyProblem({A / alpha0, 0});
+    else
+        ecs.setCauchyProblem({0, A / alpha1});
 
-    vector<double> sigma, gamma;
+    ecs.setFunction([this]( double x, vector<double> const &y ) {
+      std::vector<double> r(2);
+      r[0] = f(x) - p(x) * y[0] - q(x) * y[1];
+      r[1] = y[0];
 
-    for (uint i = 0; i < tf.getNodeCount(); i++) {
-      gamma.push_back(tf[i][0]);
-      sigma.push_back(tf[i][1]);
-    }
-
-    i.setGridY(sigma);
-    i.buildDividedDifferenceTable();
-    func sigma_f = i.HermitPolinom();
-
-    i.setGridY(gamma);
-    i.buildDividedDifferenceTable();
-    func gamma_f = i.HermitPolinom();
-
-    ecs.setFunction([sigma_f, gamma_f]( double x, vector<double> y ) -> vector<double> {
-      return {sigma_f(x) * y[0] + gamma_f(x)};
+      return r;
     });
-    ecs.setCauchyProblem({(B - beta1 * gamma_f(interval.getB())) / (beta0 + beta1 * sigma_f(interval.getB()))});
+    auto v = ecs.solve(tollerance);
 
-    return ecs.solve(tollerance).reverse();
+    double C = (B - beta0 * v[v.getNodeCount() - 1][0] - beta1 * v[v.getNodeCount() - 1][1]) /
+            (beta0 * u[u.getNodeCount() - 1][0] + beta1 * u[u.getNodeCount() - 1][1]);
+
+    return u * C + v;
+
   }
 };

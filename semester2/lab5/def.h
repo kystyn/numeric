@@ -51,6 +51,11 @@ vector<double> operator*( double h, vector<double> const &f );
 vector<double> operator*( vector<double> const &v1, vector<double> const &v2 );
 vector<double> operator-( vector<double> const &v1, vector<double> const &v2 );
 vector<double> operator+( vector<double> const &v1, vector<double> const &v2 );
+vector<pair<double, vector<double>>> operator+( vector<pair<double, vector<double>>> const &v1,
+                                                vector<pair<double, vector<double>>> const &v2 );
+vector<pair<double, vector<double>>> operator*( double h,
+                                                vector<pair<double, vector<double>>> const &v );
+
 // Chebyshev norm
 double operator!( vector<double> const &v );
 

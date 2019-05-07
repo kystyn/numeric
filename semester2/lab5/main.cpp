@@ -50,6 +50,24 @@ vector<double> operator+( vector<double> const &v1, vector<double> const &v2 ) {
   return v;
 }
 
+vector<pair<double, vector<double>>> operator+( vector<pair<double, vector<double>>> const &v1,
+                                                vector<pair<double, vector<double>>> const &v2 ) {
+    auto v = v1;
+
+    for (uint i = 0; i < v2.size(); i++)
+      v[i].second = v[i].second + v2[i].second;
+    return v;
+}
+
+vector<pair<double, vector<double>>> operator*( double h,
+                                                vector<pair<double, vector<double>>> const &v ) {
+    auto u = v;
+
+    for (uint i = 0; i < v.size(); i++)
+      u[i].second = h * v[i].second;
+    return u;
+}
+
 // Chebyshev norm
 double operator!( vector<double> const &v ) {
   double norm = 0;

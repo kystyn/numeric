@@ -192,6 +192,8 @@ private:
 public:
     tabulated_function( void ) {}
 
+    tabulated_function( vector<pair<double, vector<double>>> Coordinates ) : Coordinates(Coordinates) {}
+
     uint getNodeCount( void ) const { return NodeCount; }
 
     tabulated_function & operator<<( pair<double, vector<double>> p ) {
@@ -223,6 +225,14 @@ public:
     tabulated_function & reverse( void ) {
       std::reverse(Coordinates.begin(), Coordinates.end());
       return *this;
+    }
+
+    tabulated_function operator+( tabulated_function const &tf ) const {
+        return tabulated_function(Coordinates + tf.Coordinates);
+    }
+
+    tabulated_function operator*( double h ) const {
+        return tabulated_function(h * Coordinates);
     }
 
     friend std::ostream & operator<<( std::ostream &os, tabulated_function const &tf );
