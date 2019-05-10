@@ -192,7 +192,8 @@ private:
 public:
     tabulated_function( void ) {}
 
-    tabulated_function( vector<pair<double, vector<double>>> Coordinates ) : Coordinates(Coordinates) {}
+    tabulated_function( vector<pair<double, vector<double>>> Coordinates ) :
+      Coordinates(Coordinates), NodeCount(Coordinates.size()) {}
 
     uint getNodeCount( void ) const { return NodeCount; }
 
@@ -202,7 +203,10 @@ public:
       return *this;
     }
 
-    vector<double> operator[]( uint idx ) const {
+    vector<double> & operator[]( uint idx ) {
+      return Coordinates.at(idx).second;
+    }
+    vector<double> const & operator[]( uint idx ) const {
       return Coordinates.at(idx).second;
     }
 

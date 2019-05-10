@@ -121,6 +121,8 @@ public:
         if (s2.getNodeCount() > maxFrag)
             maxFrag = s2.getNodeCount();
 
+        frag = s2.getNodeCount();
+
         solution << s2.get(s2.getNodeCount() - 1);
     }
     return solution;
@@ -343,8 +345,8 @@ public:
     ecs.setCauchyProblem({alpha1, -alpha0});
     ecs.setFunction([this]( double x, vector<double> const &y ) {
       std::vector<double> r(2);
-      r[0] = -p(x) * y[0] - q(x) * y[1];
-      r[1] = y[0];
+      r[0] = y[1];
+      r[1] = -p(x) * y[1] - q(x) * y[0];
 
       return r;
     });
@@ -355,18 +357,27 @@ public:
     else
         ecs.setCauchyProblem({0, A / alpha1});
 
+    frag = ecs.getFrag();
+
     ecs.setFunction([this]( double x, vector<double> const &y ) {
       std::vector<double> r(2);
-      r[0] = f(x) - p(x) * y[0] - q(x) * y[1];
-      r[1] = y[0];
+      r[0] = y[1];
+      r[1] = f(x) - p(x) * y[1] - q(x) * y[0];
 
       return r;
     });
     auto v = ecs.solve(tollerance);
 
+    frag += ecs.getFrag();
+
     double C = (B - beta0 * v[v.getNodeCount() - 1][0] - beta1 * v[v.getNodeCount() - 1][1]) /
             (beta0 * u[u.getNodeCount() - 1][0] + beta1 * u[u.getNodeCount() - 1][1]);
 
-    return u * C + v;
+    auto solution = u * C + v;
+    for (uint i = 0; i < solution.getNodeCount(); i++)
+      solution[i].pop_back();
+
+
+    return solution;
   }
 };
