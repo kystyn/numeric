@@ -158,7 +158,7 @@ public:
         bps = shared_ptr<finite_difference_solver>(new finite_difference_solver);
         break;
       case 1:
-
+        bps = shared_ptr<reductor>(new reductor);
         break;
       }
 

@@ -18,10 +18,13 @@ public:
   uint getFrag( void ) const { return frag; }
 
   static double deviation( tabulated_function const &valDistr1,
-    tabulated_function const &valDistr2 ) {
+      tabulated_function const &valDistr2 ) {
 
-    return !((valDistr1[valDistr1.getNodeCount() - 1] - valDistr2[valDistr2.getNodeCount() - 1]) *
-            std::min(valDistr1[valDistr1.getNodeCount() - 1], valDistr2[valDistr2.getNodeCount() - 1]));
+      auto m = std::min(valDistr1[valDistr1.getNodeCount() - 1], valDistr2[valDistr2.getNodeCount() - 1]);
+
+      //if (!m > 1e-14)
+      //  return !((valDistr1[valDistr1.getNodeCount() - 1] - valDistr2[valDistr2.getNodeCount() - 1]) * m);
+      return !(valDistr1[valDistr1.getNodeCount() - 1] - valDistr2[valDistr2.getNodeCount() - 1]);
   }
 
   virtual tabulated_function solve( double tollerance ) = 0;
@@ -365,6 +368,5 @@ public:
             (beta0 * u[u.getNodeCount() - 1][0] + beta1 * u[u.getNodeCount() - 1][1]);
 
     return u * C + v;
-
   }
 };

@@ -74,23 +74,24 @@ double operator!( vector<double> const &v ) {
 
   for (auto &x : v)
     if (fabs(x) > norm)
-      norm = x;
+      norm = fabs(x);
 
   return norm;
 }
 
 int main()
 {
+    /*
     boundary_controller c("de.in");
     std::cout << std::setprecision(16) << kystyn::exp(1, 1e-14);
 
     c << array<func, 3>{[]( double x ) { return (2 * x + 2) / (2 * x * x + x);},
       []( double x ) { return -1.0 / (2 * x * x + x);},
       []( double x ) { return 1 / (x * (2 * x * x + x));}};
-    c.run("de.out");
+    c.run("de.out");*/
 
-    /*
-    finite_difference_solver s;
+    ///*
+    reductor s;
 
     s.setBorders(uniform(0.2, 1, 5));
     s.setBoundaryProblem(1, 0, 5, 1, 0, 1);
@@ -98,7 +99,7 @@ int main()
       []( double x ) { return (2 * x + 2) / (2 * x * x + x);},
       []( double x ) { return -1.0 / (2 * x * x + x);},
       []( double x ) { return 1 / (x * (2 * x * x + x));});
-    auto sol = s.solve(1e-3);*/ 
+    auto sol = s.solve(1e-3);//*/
 
     return 0;
 }
