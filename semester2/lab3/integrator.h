@@ -76,7 +76,7 @@ public:
 
             res += (DistrY[0] + DistrY[DistrY.getNodeCount() - 1]) / 2.0;
 
-            res *= (DistrY.getB() - DistrY.getA()) / DistrY.getNodeCount();
+            res *= (DistrY.getB() - DistrY.getA()) / (DistrY.getNodeCount() - 1);
 
             return res;
         };
@@ -85,7 +85,7 @@ public:
         setGridStep(Fragmentation);
         integralWithStepx2 = eval();
 
-        for(;fabs(integralWithStepx2 - integralWithStep) * 1 / 3.0 > Tollerance; Fragmentation <<= 1) {
+        for(;fabs(integralWithStepx2 - integralWithStep) > 3 * Tollerance; Fragmentation <<= 1) {
 
             integralWithStep = integralWithStepx2;
             setGridStep(Fragmentation << 1);

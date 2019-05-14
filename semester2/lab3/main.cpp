@@ -5,8 +5,8 @@ using namespace std;
 
 int main()
 {
-    //rado_integral_n2 i;
-    //i.setFunction([]( double x ) { return x * x * x * x; });
+    //trapezium_integral i;
+    //i.setFunction([]( double x ) { return x; });
     //i.setBorders(0, 2);
     //i.setTollerance(1e-8);
     //std::cout << i() << std::endl;
