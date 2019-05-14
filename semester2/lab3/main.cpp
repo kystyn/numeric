@@ -6,8 +6,8 @@ using namespace std;
 int main()
 {
     //rado_integral_n2 i;
-    //i.setFunction(controller::diffFunc);
-    //i.setBorders(0, 2 * 3.14159265358979323846);
+    //i.setFunction([]( double x ) { return x * x * x * x; });
+    //i.setBorders(0, 2);
     //i.setTollerance(1e-8);
     //std::cout << i() << std::endl;
     controller c("integral.in");

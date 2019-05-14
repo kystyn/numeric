@@ -9,6 +9,7 @@
 #include "distribution.h"
 #include "integrator.h"
 
+namespace kystyn {
 struct data {
   double a, b;
   uint funcT;
@@ -20,13 +21,14 @@ struct data {
     a(a), b(b),
     funcT(funcT), Tollerance(Tollerance) {}
 };
+}
 
 class controller {
 private:
   rado_integral_n2 i;
 
   vector<func> availableFunctions;
-  vector<struct data> loadedData;
+  vector<kystyn::data> loadedData;
 
   controller & loadFromFile( const char *fileName ) {
     ifstream f(fileName);
@@ -40,7 +42,7 @@ private:
         f >> b >> funcT >> tollerance;
       else
         break;
-      loadedData.push_back(data(a, b, funcT, pow(10, tollerance)));
+      loadedData.push_back(kystyn::data(a, b, funcT, pow(10, tollerance)));
     }
 
     return *this;
