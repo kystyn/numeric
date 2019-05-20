@@ -79,15 +79,27 @@ double operator!( vector<double> const &v ) {
   return norm;
 }
 
-int main()
+int main( int argc, char *argv[] )
 {
-    boundary_controller c("de.in");
-    std::cout << std::setprecision(16) << kystyn::exp(1, 1e-14);
+    auto p = []( double x ) { return (2 * x + 2) / (2 * x * x + x);};
+    auto q = []( double x ) { return -1.0 / (2 * x * x + x);};
+    auto f = []( double x ) { return 1 / (x * (2 * x * x + x));};
+    if (strcmp(argv[1], "boundary") == 0) {
+        boundary_controller c("de.in");
+        std::cout << std::setprecision(16) << kystyn::exp(1, 1e-14);
+        
+        c << array<func, 3>{p, q, f};
+        c.run("de.out");
+    }
+    else if (strcmp(argv[1], "cauchy") == 0) {
+        cauchy_controller c("de.in");
+        std::cout << std::setprecision(16) << kystyn::exp(1, 1e-14);
 
-    c << array<func, 3>{[]( double x ) { return (2 * x + 2) / (2 * x * x + x);},
-      []( double x ) { return -1.0 / (2 * x * x + x);},
-      []( double x ) { return 1 / (x * (2 * x * x + x));}};
-    c.run("de.out");
+        c << [&]( double x, std::vector<double> y ) { 
+          return std::vector<double>{y[1], 2 / (x * x * x)};
+        };
+        c.run("de.out");
+    }
 
     /*
     reductor s;
