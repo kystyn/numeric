@@ -76,7 +76,7 @@ public:
 
             res += (DistrY[0] + DistrY[DistrY.getNodeCount() - 1]) / 2.0;
 
-            res *= (DistrY.getB() - DistrY.getA()) / DistrY.getNodeCount();
+            res *= (DistrY.getB() - DistrY.getA()) / (DistrY.getNodeCount() - 1);
 
             return res;
         };
@@ -85,7 +85,7 @@ public:
         setGridStep(Fragmentation);
         integralWithStepx2 = eval();
 
-        for(;fabs(integralWithStepx2 - integralWithStep) * 1 / 3.0 > Tollerance; Fragmentation <<= 1) {
+        for(;fabs(integralWithStepx2 - integralWithStep) > 3 * Tollerance; Fragmentation <<= 1) {
 
             integralWithStep = integralWithStepx2;
             setGridStep(Fragmentation << 1);
@@ -117,19 +117,19 @@ public:
                 A2 = 0.752806125400934;
         double
                 integralWithStep = 0,
-                integralWithStepx2, prevB = 0;
+                integralWithStepx2, prevB = Function(DistrY.X()[0]);
         Fragmentation = 2;
 
         auto eval = [this, B1, x1, x2, A1, A2, &prevB] ( void ) -> double {
             double res = 0, resA1 = 0, resA2 = 0, resB = prevB;
 
-            for (uint i = 1; i < DistrY.getNodeCount(); i += 2)
+            for (uint i = 1; i < DistrY.getNodeCount() - 1; i += 2)
                 resB += Function(DistrY.X()[i]);
 
             prevB = resB;
             resB *= B1;
 
-            double h = (DistrY.getB() - DistrY.getA()) / DistrY.getNodeCount();
+            double h = (DistrY.getB() - DistrY.getA()) / (DistrY.getNodeCount() - 1);
 
             for (uint i = 1; i < DistrY.getNodeCount(); i++) {
                 resA1 += Function(h / 2.0 * x1 + (DistrY.X()[i - 1] + DistrY.X()[i]) / 2.0);
@@ -144,14 +144,13 @@ public:
             return res;
         };
 
-
         DistrY.setBorders(Fragmentation);
         integralWithStepx2 = eval();
 
-        for(;fabs(integralWithStepx2 - integralWithStep) > Tollerance;) {
+        for(;fabs(integralWithStepx2 - integralWithStep) > 15 * Tollerance;) {
 
             integralWithStep = integralWithStepx2;
-            DistrY.setBorders(Fragmentation <<= 1);
+            DistrY.setBorders(Fragmentation  = ((Fragmentation - 1) << 1) + 1);
             integralWithStepx2 = eval();
         }
 

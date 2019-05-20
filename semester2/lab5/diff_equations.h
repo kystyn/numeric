@@ -13,6 +13,8 @@ protected:
   uint frag;
   uniform interval;
 public:
+  uint evalVolume;
+
   uint getMinFrag( void ) const { return minFrag; }
   uint getMaxFrag( void ) const { return maxFrag; }
   uint getFrag( void ) const { return frag; }
@@ -101,6 +103,8 @@ public:
     tabulated_function solution;
     minFrag = 0xFFFFFFFF;
     maxFrag = 0;
+    frag = 0;
+    evalVolume = 0;
 
     solution << make_pair<>(interval[0], cauchyProblem);
 
@@ -114,6 +118,7 @@ public:
         for (; deviation(s2, s1) >= 3 * tollerance;) {
             s1 = s2;
             eval(funct, s2, interval[i], solution[i], interval[i + 1], localFrag = ((localFrag - 1) << 1) + 1);
+            evalVolume += 1 + (localFrag - 1) * 3;
         }
 
         if (s2.getNodeCount() < minFrag)
@@ -121,7 +126,7 @@ public:
         if (s2.getNodeCount() > maxFrag)
             maxFrag = s2.getNodeCount();
 
-        frag = s2.getNodeCount();
+        frag += s2.getNodeCount();
 
         solution << s2.get(s2.getNodeCount() - 1);
     }
@@ -299,9 +304,11 @@ public:
     //return tridiagSolveLast(a, b, c, d);
   }
 
+ 
   tabulated_function solve( double tollerance ) override {
       tabulated_function solution;
       frag = 0;
+      evalVolume = 0;
     
       vector<double> s1, s2;
       uint localFrag = 1;
@@ -314,6 +321,7 @@ public:
       for (; isContinue;) {
           s1 = s2;
           s2 = eval(g2);
+          evalVolume += g2.getNodeCount() * 4;
           isContinue = false;
           for (uint i = 0, j = 0; i < s1.size() && j < s2.size(); i += (s1.size() - 1) / (interval.getNodeCount() - 1), j += (s2.size() - 1) / (interval.getNodeCount() - 1)) {
               if (fabs(s1[i] - s2[j]) >= 3 * tollerance) {
@@ -332,7 +340,7 @@ public:
         solution << make_pair<>(interval[i / ((s2.size() - 1) / (interval.getNodeCount() - 1))], vector<double>{s2[i]});
 
       return solution;
-  }
+}
 };
 
 class reductor : public boundary_problem_solver {
@@ -358,6 +366,7 @@ public:
         ecs.setCauchyProblem({0, A / alpha1});
 
     frag = ecs.getFrag();
+    evalVolume = ecs.evalVolume;
 
     ecs.setFunction([this]( double x, vector<double> const &y ) {
       std::vector<double> r(2);
@@ -368,7 +377,9 @@ public:
     });
     auto v = ecs.solve(tollerance);
 
-    frag += ecs.getFrag();
+    frag = std::max(ecs.getFrag(), frag);
+    evalVolume += ecs.evalVolume;
+    minFrag = maxFrag = frag;
 
     double C = (B - beta0 * v[v.getNodeCount() - 1][0] - beta1 * v[v.getNodeCount() - 1][1]) /
             (beta0 * u[u.getNodeCount() - 1][0] + beta1 * u[u.getNodeCount() - 1][1]);

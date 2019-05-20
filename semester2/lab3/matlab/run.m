@@ -15,8 +15,8 @@ function run()
     end
     fclose(F);
     
-    %system('lab3.exe');
-    system('./lab3');
+    system('lab3.exe');
+    %system('./lab3');
     [X, Y] = fileParser('integral.out');
     
     figure;
@@ -25,7 +25,7 @@ function run()
     grid on;
 
     figure;
-    drawSmth(tolls, Y, 'r', strcat('Dependence of step count on precision ', char('0' + funcT),'-diff. function'), ...
+    drawSmth(tolls, Y, 'r', strcat('Dependence of step count on precision ', char('0' + funcT), '-diff. function'), ...
     'Fact precision', 'Step count');
     grid on;
   end

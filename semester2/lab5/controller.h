@@ -33,14 +33,14 @@ struct boundary_data {
 struct cauchy_data {
   uint methodN;
   double a, b;
-  double cauchyProblem;
+  std::vector<double> cauchyProblem;
   uint fragmentation;
   double Tollerance;
 
   cauchy_data( void ) : a(0), b(0), cauchyProblem(0),
       fragmentation(0), Tollerance(1e-16) {}
 
-  cauchy_data( uint methodN, double a, double b, double cauchyProblem, uint fragmentation,
+  cauchy_data( uint methodN, double a, double b, std::vector<double> const &cauchyProblem, uint fragmentation,
         double Tollerance ) :
     methodN(methodN), a(a), b(b), cauchyProblem(cauchyProblem),
     fragmentation(fragmentation), Tollerance(Tollerance) {}
@@ -58,16 +58,22 @@ private:
     ifstream f(fileName);
   
     for (int i = 0; ; i++) {
+      uint dim;
       uint methodN;
       double a, b;
-      double cp;
+      std::vector<double> cp;
       uint frag;
       double tollerance;
 
-      if (f >> methodN)
-        f >> a >> b >> cp >> frag >> tollerance;
+      if (f >> dim) {
+        cp.resize(dim);
+        f >> methodN >> a >> b;
+      }
       else
         break;
+      for (auto &x : cp)
+        f >> x;
+      f >> frag >> tollerance;
       loadedData.push_back(kyst::cauchy_data(methodN, a, b, cp, frag, tollerance));
     }
 
@@ -102,10 +108,12 @@ public:
       }
       cps->setBorders(d.a, d.b);
       cps->setFunction(funct);
-      cps->setCauchyProblem({d.cauchyProblem});
+      cps->setCauchyProblem(d.cauchyProblem);
       cps->setFragmentation(d.fragmentation);
       auto tf = cps->solve(d.Tollerance);
-        fs << std::setprecision(16) << cps->getFrag() << ' ' << cps->getMinFrag() << ' ' << cps->getMaxFrag() << endl << tf << endl;
+        fs << std::setprecision(16) << cps->getFrag() << ' ' << cps->getMinFrag() << ' ' <<
+          cps->getMaxFrag() << ' ' << 0 << ' ' <<
+          cps->evalVolume << ' ' << endl << tf << endl;
     }
   }
 };
@@ -154,10 +162,10 @@ public:
 
     for (auto &d : loadedData) {
       switch (d.methodN) {
-      case 0:
+      case 1:
         bps = shared_ptr<finite_difference_solver>(new finite_difference_solver);
         break;
-      case 1:
+      case 2:
         bps = shared_ptr<reductor>(new reductor);
         break;
       }
@@ -167,7 +175,9 @@ public:
       bps->setBoundaryProblem(d.alpha0, d.alpha1, d.A, d.beta0, d.beta1, d.B);
       bps->setFragmentation(d.fragmentation);
       auto tf = bps->solve(d.Tollerance);
-        fs << std::setprecision(16) << bps->getFrag() << ' ' << bps->getMinFrag() << ' ' << bps->getMaxFrag() << endl << tf << endl;
+        fs << std::setprecision(16) << bps->getFrag() << ' ' << bps->getMinFrag() << 
+          ' ' << bps->getMaxFrag() << ' ' << 
+          0 << ' ' << bps->evalVolume << ' ' << endl << tf << endl;
     }
   }
 };
