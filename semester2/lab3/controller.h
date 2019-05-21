@@ -51,12 +51,12 @@ private:
 public:
 
   static double diffFunc( double x ) {
-    return sin(x);
+    return x * x * x * cos(x);
     //return pow(x, 8) + 1;
   }
 
   static double nonDiffFunc( double x ) {
-    return fabs(sin(x));
+    return fabs(x * x * x * cos(x));
   }
 
   controller( const char *fileName = nullptr ) {

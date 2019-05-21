@@ -1,6 +1,6 @@
 #include <iostream>
+#include <cstring>
 #include "controller.h"
-
 
 using namespace std;
 
@@ -96,7 +96,7 @@ int main( int argc, char *argv[] )
         std::cout << std::setprecision(16) << kystyn::exp(1, 1e-14);
 
         c << [&]( double x, std::vector<double> y ) { 
-          return std::vector<double>{y[1], 2 / (x * x * x)};
+          return std::vector<double>{y[1], f(x) - p(x) * y[1] - q(x) * y[0]};
         };
         c.run("de.out");
     }

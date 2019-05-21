@@ -26,8 +26,8 @@ format long;
       tolls(toll) = 10 ^ -toll;
       fclose(F);
 
-      system('lab5.exe cauchy');
-      %system('./lab5');
+      %system('lab5.exe cauchy');
+      system('./lab5 cauchy');
       [X, Y, frag, minfrag, maxfrag, maxerrlocal, volume, fr] = fileParser('de.out');
       [drawY(1, toll), drawErrLocal(1, toll)] = deviation(Y, X, f, fr);
       drawFrag(1, toll) = frag;
@@ -41,8 +41,8 @@ format long;
           tolls(toll) = 10 ^ -toll;
           fclose(F);
 
-          system('lab5.exe boundary');
-          %system('./lab5');
+          %system('lab5.exe boundary');
+          system('./lab5 boundary');
           [X, Y, frag, minfrag, maxfrag, maxerrlocal, volume, fr] = fileParserBoundary('de.out');
           [drawY(t + 1, toll), drawErrLocal(t + 1, toll)] = deviation(Y, X, f, fr);
           drawFrag(t + 1, toll) = frag;
@@ -91,8 +91,8 @@ format long;
       prepare(F, 0, a, b, cp .* (1 + 10 ^ error), 10 ^ -toll);
       fclose(F);
 
-      system('lab5.exe cauchy');
-      %system('./lab5');
+      %system('lab5.exe cauchy');
+      system('./lab5 cauchy');
       [X, Y, frag, minfrag, maxfrag, maxerrlocal, volume, fr] = fileParser('de.out');
       drawX(1, i) = 10 ^ error;
       drawY(1, i) = deviation(Y, X, f, fr);
@@ -106,8 +106,8 @@ format long;
           prepare_boundary(F, t, a, b, a0, a1, A * (1 + 10 ^ error), b0, b1, B * (1 - 10 ^ error), 10 ^ -toll);
           fclose(F);
 
-          system('lab5.exe boundary');
-          %system('./lab5');
+          %system('lab5.exe boundary');
+          system('./lab5 boundary');
           [X, Y, frag, minfrag, maxfrag, maxerrlocal, volume, fr] = fileParserBoundary('de.out');
           drawX(t + 1, i) = 10 ^ error;
           drawY(t + 1, i) = deviation(Y, X, f, fr);
